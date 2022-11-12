@@ -1,0 +1,184 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Template 1 1`] = `
+[
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::content::core::binding",
+    },
+  },
+  null,
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::content::core::infrastructure",
+    },
+  },
+  null,
+  null,
+  {
+    "XtendInstruction": {
+      "extension": "extensions::esb",
+    },
+  },
+  null,
+  {
+    "XtendInstruction": {
+      "extension": "extensions::wsdl",
+    },
+  },
+  null,
+  null,
+  {
+    "XtendInstruction": {
+      "define": "Root(Environment environment) FOR PortBinding",
+    },
+  },
+  null,
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  null,
+  null,
+  {
+    "XtendInstruction": {
+      "define": "Root(Environment environment) FOR UsingPortBinding",
+    },
+  },
+  null,
+  {
+    "XtendInstruction": {
+      "bedingung": "!hasRESTPort(usingPort.getUsingPort()) && !isNotificationPort(usingPort) && ConnectedProvider(environment) != null",
+    },
+  },
+  null,
+  {
+    "XtendInstruction": {
+      "expand": "Root(environment, "/consumer/", usingPort.portType, ConnectedProvider(environment))",
+    },
+  },
+  null,
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  null,
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  null,
+]
+`;
+
+exports[`Template 2 1`] = `
+[
+  {
+    "XtendInstruction": {
+      "bedingung": "isAQDirect(port)-",
+    },
+  },
+  {
+    "template text": "<service protocol="jms" errorHandler="jmsErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
+    <jmsBinding jndiConnectionFactory="java:comp/env/",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getCFName(environment, port)",
+    },
+  },
+  {
+    "template text": """,
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getWorkerPool()",
+    },
+  },
+  {
+    "template text": ">
+      <queueName>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getAQDirectQueueName(port)",
+    },
+  },
+  {
+    "template text": "</queueName>
+    </jmsBinding>
+    <actionPipeline name="jmsErrorhandler">
+      <conditional expression="contains(exception/message, 'JMS')">
+        <throwException message="recoverable IO exception"/>
+      </conditional>
+  ",
+  },
+  {
+    "XtendInstruction": {
+      "expand": "Dashboard::LogUndeliveredMessage("Request", "exception/message/text()", "if (exception/cause) then exception/cause/text() else ''", "") FOR environment-",
+    },
+  },
+  {
+    "template text": "</actionPipeline>
+  ",
+  },
+  {
+    "XtendInstruction": "ELSE",
+  },
+  {
+    "template text": "<service protocol="http" errorHandler="soapErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
+    <httpBindURI",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getMaxPool()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "port.getMTOMSupport() != null",
+    },
+  },
+  {
+    "template text": "multipartResponse="application/xop+xml"",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "template text": ">/",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ESB0ServicePortAddressLocation()",
+    },
+  },
+  {
+    "template text": "</httpBindURI>
+    <actionPipeline name="soapErrorhandler">
+      <transform>
+  ",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "externalInterface.isExternalAndSOAP12()-",
+    },
+  },
+  {
+    "template text": "<xquery><![CDATA[<soap:Fault xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+    <soap:Code><soap:Value>soap:Receiver</soap:Value></soap:Code>
+    <soap:Reason><soap:Text xml:lang="en">{exception/message/text()}</soap:Text></soap:Reason>
+    <soap:Detail>{exception/cause}</soap:Detail>
+  </soap:Fault>]]></xquery>
+  ",
+  },
+  {
+    "XtendInstruction": "ELSE",
+  },
+  {
+    "template text": "<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>{exception/message/text()}</faultstring><detail>{exception/cause}</detail></soapenv:Fault>]]></xquery>
+  ",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  null,
+]
+`;

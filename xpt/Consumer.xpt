@@ -1,0 +1,466 @@
+«IMPORT com::tmobile::ei::sbp::mm::foundation»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::iface»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::architecture»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::binding»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::infrastructure»
+
+«EXTENSION extensions::esb»
+«EXTENSION extensions::wsdl»
+
+«DEFINE Root(Environment environment) FOR PortBinding»
+«ENDDEFINE»
+
+«DEFINE Root(Environment environment) FOR UsingPortBinding»
+«IF !hasRESTPort(usingPort.getUsingPort()) && !isNotificationPort(usingPort) && ConnectedProvider(environment) != null»
+«EXPAND Root(environment, "/consumer/", usingPort.portType, ConnectedProvider(environment))»
+«ENDIF»
+«ENDDEFINE»
+
+«DEFINE Root(Environment environment) FOR ProvidingPortBinding»
+«IF providingPort.isAsyncPort()»
+«EXPAND Root(environment, "/consumer/callback/", getOppositePortType(providingPort), null)»
+«ELSEIF providingPort.isNotificationPort()»
+«EXPAND Root(environment, "/provider/", providingPort.portType, null)»
+«ENDIF»
+«ENDDEFINE»
+
+«DEFINE Root(Environment environment, String relDir, WSDLPortType destPortType, ProvidingPortBinding includePPB) FOR PortBinding»
+«LET getPrivateServiceSignaturePortAdapter(port) AS externalInterface»
+«FILE XServiceRef(port, environment, relDir) + ".xservice"»<?xml version="1.0" encoding="UTF-8"?>
+«IF isDispatched() || isSecurityProxyDispatched()-»
+<service protocol="internal" version="1" xmlns="http://www.artofarc.com/esb/service">
+«ELSE-»
+«IF isAQDirect(port)-»
+<service protocol="jms" errorHandler="jmsErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
+	<jmsBinding jndiConnectionFactory="java:comp/env/«getCFName(environment, port)»"«getWorkerPool()»>
+		<queueName>«getAQDirectQueueName(port)»</queueName>
+	</jmsBinding>
+	<actionPipeline name="jmsErrorhandler">
+		<conditional expression="contains(exception/message, 'JMS')">
+			<throwException message="recoverable IO exception"/>
+		</conditional>
+«EXPAND Dashboard::LogUndeliveredMessage("Request", "exception/message/text()", "if (exception/cause) then exception/cause/text() else ''", "") FOR environment-»
+	</actionPipeline>
+«ELSE-»
+<service protocol="http" errorHandler="soapErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
+	<httpBindURI«getMaxPool()»«IF port.getMTOMSupport() != null» multipartResponse="application/xop+xml"«ENDIF»>/«ESB0ServicePortAddressLocation()»</httpBindURI>
+	<actionPipeline name="soapErrorhandler">
+		<transform>
+«IF externalInterface.isExternalAndSOAP12()-»
+			<xquery><![CDATA[<soap:Fault xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+	<soap:Code><soap:Value>soap:Receiver</soap:Value></soap:Code>
+	<soap:Reason><soap:Text xml:lang="en">{exception/message/text()}</soap:Text></soap:Reason>
+	<soap:Detail>{exception/cause}</soap:Detail>
+</soap:Fault>]]></xquery>
+«ELSE-»
+			<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>{exception/message/text()}</faultstring><detail>{exception/cause}</detail></soapenv:Fault>]]></xquery>
+«ENDIF-»
+		</transform>
+		<branchOnVariable variable="MEP">
+			<default>
+«IF hasToBeLogged(environment, null, 53)-»
+				<branchOnVariable variable="operation">
+					<branch value="checkAlive"/>
+					<default>
+«EXPAND Dashboard::LogWithMessage(environment, null, 53, "'Transformation (internes Format -> KDM)'", "Fault", "'FatalFault'", FaultErrorCodeXPath(), null, null)-»
+					</default>
+				</branchOnVariable>
+«ENDIF-»
+				<assign contextItem="HttpResponseCode">
+					<assignment variable="HttpResponseCode">if (string()!='' and (.=503 or .=504)) then . else 500</assignment>
+				</assign>
+				<wrapSOAP«IF externalInterface.isExternalAndSOAP12()» soap12="true"«ENDIF»/>
+«IF hasToBeLogged(environment, null, 57)-»
+				<branchOnVariable variable="operation">
+					<branch value="checkAlive"/>
+					<default>
+«EXPAND Dashboard::Log(environment, null, 57, "Fault Routing zum SC")-»
+					</default>
+				</branchOnVariable>
+			</default>
+			<null>
+				<setMessage>
+					<variable name="HttpResponseCode" javaType="java.lang.Integer">500</variable>
+				</setMessage>
+				<wrapSOAP«IF externalInterface.isExternalAndSOAP12()» soap12="true"«ENDIF»/>
+			</null>
+		</branchOnVariable>
+«ENDIF-»
+	</actionPipeline>
+«ENDIF-»
+«IF getAssumeContentType(port) != null-»
+	<setMessage>
+		<header name="Content-Type">«getAssumeContentType(port)»</header>
+	</setMessage>
+«ENDIF-»
+«IF externalInterface == null-»
+«IF isAQDirect(port)-»
+	<setMessage>
+		<header name="Content-Type">text/xml</header>
+	</setMessage>
+«ENDIF-»
+	<unwrapSOAP wsdlURI="«getWsdlUri()»"«IF isNotPureSyncPort(port)» binding="«WsdlBindingName(destPortType)»"«ENDIF»/>
+	<assign>
+		<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+		<assignment variable="serviceNamespace">namespace-uri(.)</assignment>
+		<assignment variable="messageHeader">*[1]</assignment>
+		<assignment variable="timeleft" nullable="true" type="xs:int">$messageHeader/v1:expectedResponseTimeInMillis[1]</assignment>
+«IF isAQDirect(port)-»
+		<assignment variable="_request">.</assignment>
+«ENDIF-»
+	</assign>
+«ELSE-»
+«IF getMessageStandard(externalInterface) != MessageStandard::INSTANCE_XML-»
+«LET parseExternalWSDL(externalInterface.providerPrivateServiceSignature) AS def-»
+	<unwrapSOAP wsdlURI="/extern/«normalizePath(externalInterface.providerPrivateServiceSignature)»" soap12="«def.isSOAP12()»"/>
+«ENDLET-»
+«ENDIF-»
+«ENDIF-»
+«ENDIF-»
+«IF externalInterface != null-»
+	<assign>
+	    <bindName nullable="true">X-Message-ID</bindName>
+		<bindName nullable="true">X-Process-ID</bindName>
+		<assignment variable="serviceNamespace">'«port.portType.TargetNamespaceUri()»'</assignment>
+		<assignment variable="messageHeader"><![CDATA[<v1:messageHeader xmlns:v1="http://svi.de/kdf/ei/foundation/v1">
+	<v1:senderFQN>«port.fullyQualifiedName»</v1:senderFQN>
+	<v1:messageId>{if ($X-Message-ID='') then concat('M-',fn-artofarc:uuid()) else $X-Message-ID}</v1:messageId>
+	<v1:senderCurrentTimestampUTC>{format-dateTime(adjust-dateTime-to-timezone(current-dateTime(),xs:dayTimeDuration('PT0H')),'[Y,4]-[M,2]-[D,2]T[H01]:[m01]:[s01].[f,3]Z')}</v1:senderCurrentTimestampUTC>
+	<v1:processInstanceId>{if ($X-Process-ID='') then concat('P-',fn-artofarc:uuid()) else $X-Process-ID}</v1:processInstanceId>
+</v1:messageHeader>]]></assignment>
+«IF port.getAllowedOperations().exists(o|port.isUsingRequestForResponse(o))-»
+		<assignment variable="request">.</assignment>
+«ENDIF-»
+	</assign>
+«ENDIF-»
+«IF port.getMTOMSupport() == "ByValue"-»
+	<deserializeMtomXop/>
+«ENDIF-»
+	<branchOnVariable variable="operation">
+«FOREACH port.getAllowedOperations().reject(e|e.messageExchangePattern == MessageExchangePattern::SYNC_REQ_REP && isAQDirect(port)) AS operation-»
+		<branch value="«isDispatched() ? operation.name : getOperationName(port, operation)»">
+			<setMessage>
+				<variable name="MEP">«getMEP(port, operation).asString()»</variable>
+«IF !isDispatched() && getOperationName(port, operation) != operation.name-»
+				<variable name="operation">«operation.name»</variable>
+«ENDIF-»
+			</setMessage>
+«IF externalInterface == null-»
+			<conditional contextItem="messageHeader" expression="not(v1:senderFQN[1] and v1:messageId[1] and v1:senderCurrentTimestampUTC[1] and v1:processInstanceId[1])">
+				<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+«EXPAND Dashboard::LogRejectedMessage("${MEP}", 2, "Request vom SC empfangen", "Request", isAQDirect(port) ? null : "SOA-000", "MessageHeader not valid",	"	") FOR environment-»
+			</conditional>
+«ENDIF-»
+«EXPAND Dashboard::LogWithMessage(environment, operation, 2, "'Request vom SC empfangen'", "Request", "''", "''", getReferenceExpressionESB0(port, operation), null)-»
+«LET port.portOperations.selectFirst(e|e.operation == operation).adapters AS adapters-»
+«IF adapters.size > 0-»
+«IF needsRequestValidationInbound()-»
+«IF port.isUsingRequestHeader(operation)-»
+«FOREACH getRequestHeaderElements(port, operation) AS elementName-»
+			<validate schemaURI="/extern/«schemaLocation(port, elementName)»" expression="*" contextItem="header"/>
+«ENDFOREACH-»
+«ENDIF-»
+«IF isNoExternalValidation(usingPort) != "true"-»
+			<validate schemaURI="/«getRequestElementSchemaLocation(port, operation)»"/>
+«ENDIF-»			
+«EXPAND Dashboard::Log(environment, operation, 3, "Request externes Format Validierung")-»
+«ENDIF-»
+«IF port.isUsingRequestHeader(operation)-»
+			<assign>
+				<bindName>header</bindName>
+«FOREACH getRequestHeaderElements(port, operation) AS elementName-»
+				<nsDecl namespace="«elementName.namespaceURI»" prefix="rh"/>
+				<assignment variable="requestHeader">$header/rh:«elementName.localPart»</assignment>
+«ENDFOREACH-»
+			</assign>
+«ENDIF-»
+«EXPAND RequestAdapter(environment, this, operation) FOREACH adapters-»
+«EXPAND Dashboard::LogWithMessage(environment, operation, 4, "'Request Transformation (externes Format -> KDM)'", "Request", "''", "''", null, null)-»
+«ENDIF-»
+«IF adapters.size > 0 || needsRequestValidationInbound()-»
+«IF isNoInternalValidation(port) != "true"-»
+			<validate schemaURI="«getWsdlUri()»"/>
+«ENDIF-»
+«ENDIF-»
+«IF externalInterface == null-»
+«EXPAND CheckMessageHeader("v1:senderFQN[1] != '" + (operation.isCheckAlive() ? "de.svi.architecture.ei.dashboard:monitoring:checkAlive" : port.fullyQualifiedName) + "'", "SOA-001: Routing not allowed for {$messageHeader/v1:senderFQN[1]/text()}")-»
+«IF WSDLAsyncResponseOperation.isInstance(operation)-»
+«EXPAND CheckMessageHeader("not(v1:relatesToMessageId[1])", "SOA-009: relatesToMessageId ist nicht gesetzt")-»
+«EXPAND CheckMessageHeader("not(v1:replyContext[1])", "SOA-010: replyContext ist nicht gesetzt")-»
+«ENDIF-»
+«ENDIF-»
+«ENDLET-»
+«EXPAND Dashboard::Log(environment, operation, 5, "Request Payload Validierung")-»
+«IF port.hasContentBasedRouting()-»
+«FOREACH ((UsingPort) port).alternativeConnections AS connector-»
+«LET connector.provider.providingPortBindings.selectFirst(e|e.isBoundTo(environment)) AS ppb-»
+«IF ppb != null-»
+			<conditional expression="«getConnectorExpressionESB0(connector)»">
+«EXPAND Route(environment, ppb, operation)-»
+			</conditional>
+«ENDIF-»
+«ENDLET-»
+«ENDFOREACH-»
+«ENDIF-»
+«EXPAND Route(environment, includePPB, operation)-»
+		</branch>
+«ENDFOREACH-»
+		<default>
+«EXPAND Dashboard::LogRejectedMessage("unbekannt", 2, "Request vom SC empfangen", "Request", isAQDirect(port) ? null : "SOA-006", "Operation not allowed", "") FOR environment-»
+		</default>
+	</branchOnVariable>
+</service>
+«ENDFILE»
+«ENDLET»
+«ENDDEFINE»
+
+«DEFINE Route(Environment environment, ProvidingPortBinding includePPB, WSDLOperation operation) FOR PortBinding-»
+«LET getPrivateServiceSignaturePortAdapter(port) AS externalInterface-»
+«IF includePPB != null && operation.getMEP(port) == MessageExchangePattern::SYNC_REQ_REP-»
+  			<internalService serviceURI="«OutboundServiceRef(includePPB.providingPort)»"/>
+«ELSEIF operation.getMEP(port) == MessageExchangePattern::NOTIFICATION-»
+			<xml2json schemaURI="«getWsdlUri()»"/>
+			<setMessage clearAll="true"/>
+			<produceKafka topic="BDST_PARTNER">
+				<property key="bootstrap.servers">10.126.24.131:9092</property>
+				<property key="key.serializer">org.apache.kafka.common.serialization.LongSerializer</property>
+				<property key="value.serializer">org.apache.kafka.common.serialization.StringSerializer</property>
+			</produceKafka>
+«ELSE-»
+«LET includePPB != null ? isRequestQueuePropagated(getProvidingPort(port)) : isResponseQueuePropagated(getProvidingPort(port)) AS propagated-»
+			<setMessage clearAll="true">
+				<header name="MEP">${MEP}</header>
+				<header name="operation">${operation}</header>
+«IF getUnifiedAQDeadLetterQueueName(propagated) != null-»
+				<header name="JMS_OracleExcpQ">«getUnifiedAQDeadLetterQueueName(propagated)»</header>
+«ENDIF-»
+			</setMessage>
+«IF WSDLAsyncResponseOperation.isInstance(operation)-»
+			<assign contextItem="messageHeader">
+				<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+				<assignment header="originator">v1:replyContext[1]/text()</assignment>
+			</assign>
+«ELSEIF operation.getMEP(port) == MessageExchangePattern::ASYNC_REQ_REP-»
+			<transform>
+				<xquery>import module namespace fn-svi='http://svi.de/esb/service-utils' at '/modules/service-utils.xqm'; fn-svi:copyAndInsertReplyContext(., '«port.fullyQualifiedName»')</xquery>
+			</transform>
+«ENDIF-»
+			<jms jndiConnectionFactory="java:comp/env/jms/EIConnectionFactory" timeToLive="«IF isTimeoutModelled()»«getTimeout()»«ELSE»«getTimeToLiveDefault()»«ENDIF»">
+«IF includePPB != null-»
+«IF isRequestQueuePropagated(getProvidingPort(port))-»
+				<topicName>«getAQRequestQueueName(getProvidingPort(port))»</topicName>
+«ELSE-»
+				<queueName>«getAQRequestQueueName(getProvidingPort(port))»</queueName>
+«ENDIF-»
+«ELSE-»
+«IF isResponseQueuePropagated(getProvidingPort(port))-»
+				<topicName>«getAQResponseQueueName(getProvidingPort(port))»</topicName>
+«ELSE-»
+				<queueName>«getAQResponseQueueName(getProvidingPort(port))»</queueName>
+«ENDIF-»
+«ENDIF-»
+			</jms>
+«IF !isAQDirect(port)-»
+			<assign contextItem="messageHeader">
+				<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+				<assignment variable="messageHeader"><![CDATA[
+					<v1:messageHeader>
+						<v1:senderFQN>de.svi.architecture.ei.esb:internal:acknowledge</v1:senderFQN>
+						<v1:messageId>{v1:messageId[1]/text()}</v1:messageId>
+						<v1:senderCurrentTimestampUTC>{v1:senderCurrentTimestampUTC[1]/text()}</v1:senderCurrentTimestampUTC>
+						<v1:processInstanceId>{v1:processInstanceId[1]/text()}</v1:processInstanceId>
+						{v1:parentProcessInstanceId[1]}
+					</v1:messageHeader>
+					]]>
+				</assignment>
+				<assignment variable="header"><![CDATA[<soapenv:Header xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"/>]]></assignment>
+			</assign>
+			<transform>
+				<xquery><![CDATA[declare variable $messageHeader as element() external; <pt:«getOutputElement(operation).name» xmlns:pt="«TargetNamespaceUri(port.portType)»">
+	{$messageHeader}
+	<payload xmlns="«getOutputElement(operation).getXMLSchemaComponentForMessageElement().targetNamespace.URI»">
+	</payload>
+</pt:«getOutputElement(operation).name»>]]></xquery>
+			</transform>
+«ENDIF-»
+«ENDLET-»
+«ENDIF-»
+«LET port.portOperations.selectFirst(e|e.operation == operation).adapters AS adapters-»
+«IF adapters.size > 0-»
+«EXPAND ResponseAdapter(environment, this, operation) FOREACH adapters-»
+«EXPAND Dashboard::LogWithMessage(environment, operation, 15, "'Response Transformation (KDM -> externes Format)'", "Response", "''", "''", null, null)-»
+«IF needsResponseValidationInbound()-»
+«LET getResponseElementSchemaLocation(port, operation) AS schemaLocation-»
+			<validate schemaURI="/«schemaLocation»"/>
+«ENDLET-»
+«EXPAND Dashboard::Log(environment, operation, 16, "Response externes Format Validierung")-»
+«ENDIF-»
+«ENDIF-»
+«ENDLET-»
+«IF externalInterface == null-»
+«IF !isAQDirect(port)-»
+			<wrapSOAP/>
+			<assign>
+				<nsDecl namespace="http://schemas.xmlsoap.org/soap/envelope/" prefix="soapenv"/>
+				<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+				<assignment header="X-SOAPFault">if (soapenv:Body/soapenv:Fault/detail/*[1]/v1:payload/v1:faultCategory) then
+				 soapenv:Body/soapenv:Fault/detail/*[1]/v1:payload/v1:faultCategory/text() else 'technical'</assignment>
+			</assign>
+«ENDIF-»
+«ELSE-»
+«IF getMessageStandard(externalInterface) != MessageStandard::INSTANCE_XML-»
+«LET parseExternalWSDL(externalInterface.providerPrivateServiceSignature) AS def-»
+«IF getSOAPHeader(port, operation) != null-»
+			<assign>
+«IF port.isUsingRequestHeader(operation)-»
+				<bindName>requestHeader</bindName>
+«ENDIF-»
+				<assignment variable="header"><![CDATA[<soapenv:Header xmlns:soapenv="«IF def.isSOAP12()»http://www.w3.org/2003/05/soap-envelope«ELSE»http://schemas.xmlsoap.org/soap/envelope/«ENDIF»">{«getSOAPHeader(port, operation)»}</soapenv:Header>]]></assignment>
+			</assign>
+			<wrapSOAP header="true" soap12="«def.isSOAP12()»"/>
+«ELSE-»
+			<wrapSOAP soap12="«def.isSOAP12()»"/>
+«ENDIF-»
+«ENDLET-»
+«ENDIF-»
+«ENDIF-»
+«EXPAND Dashboard::Log(environment, operation, 17, "Response Routing zum SC")-»
+«ENDLET-»
+«ENDDEFINE»
+
+«DEFINE CheckMessageHeader(String expr, String faultMessage) FOR PortBinding-»
+			<conditional contextItem="messageHeader" expression="«expr»">
+				<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+«IF isAQDirect(port)-»
+				<throwException message="«faultMessage»"/>
+«ELSE-»
+				<transform>
+					<xquery><![CDATA[«IF faultMessage.contains("$messageHeader")»declare namespace v1="http://svi.de/kdf/ei/foundation/v1"; declare variable $messageHeader external; «ENDIF»<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>«faultMessage»</faultstring></soapenv:Fault>]]></xquery>
+				</transform>
+				<setMessage>
+					<variable name="HttpResponseCode" javaType="java.lang.Integer">500</variable>
+				</setMessage>
+				<wrapSOAP/>
+«ENDIF-»
+			</conditional>
+«ENDDEFINE»
+
+«DEFINE RequestAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR PortAdapter-»
+«ERROR "PortAdapter type not supported: " + this»
+«ENDDEFINE»
+
+«DEFINE RequestAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR PortAdapterReference-»
+«EXPAND RequestAdapter(environment, portBinding, operation) FOREACH adapterType.adapters-»
+«ENDDEFINE»
+
+«DEFINE RequestAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR XQueryReqRespPortAdapter-»
+«LET getTransformationResourceFileName(portBinding.port, operation, "Request") + ".xq" AS xqFile-»
+«FILE artefactsDir(environment) + xqFile-»
+«IF requestXQuery != null && requestXQuery.length > 0-»
+«IF isLegacy(portBinding.port) && requestXQuery.contains("fn-bea:")-»
+import module namespace fn-bea='http://osb-legacy-support' at '/modules/osb-legacy-support.xqm';
+«ENDIF-»
+«requestXQuery-»
+«ELSE-»
+«EXPAND XQuery3Template::Request(operation) FOR portBinding.port-»
+«ENDIF-»
+«ENDFILE-»
+«IF isLegacy(portBinding.port)-»
+			<assign>
+				<bindName>messageHeader</bindName>
+«IF portBinding.port.isUseHeaderForRequestTransformation(operation)-»
+				<bindName>requestHeader</bindName>
+				<assignment variable="«getRequestHeaderElements(portBinding.port, operation).first().localPart»1">$requestHeader</assignment>
+«ENDIF-»
+				<assignment variable="messageHeader1">$messageHeader</assignment>
+«LET getRequestElement(portBinding.port, operation) AS element-»
+				<assignment variable="«element.localPart.toFirstLower()»1">.</assignment>
+«ENDLET-»
+			</assign>
+«ENDIF-»
+			<transform xqueryURI="«xqFile»"/>
+«ENDLET-»
+«ENDDEFINE»
+
+«DEFINE RequestAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR JavaReqRespPortAdapter-»
+«IF requestImplementationClass != null-»
+			<setMessage classLoader="/lib/«getQualifiedName()»">
+				<body javaType="«implementationClass»" method="«requestImplementationClass»">${body}</body>
+			</setMessage>
+«ENDIF-»
+«ENDDEFINE»
+
+«DEFINE ResponseAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR PortAdapter-»
+«ERROR "PortAdapter type not supported: " + this»
+«ENDDEFINE»
+
+«DEFINE ResponseAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR PortAdapterReference-»
+«EXPAND ResponseAdapter(environment, portBinding, operation) FOREACH adapterType.adapters-»
+«ENDDEFINE»
+
+«DEFINE ResponseAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR XQueryReqRespPortAdapter-»
+«IF operation.getMEP(portBinding.port) == MessageExchangePattern::SYNC_REQ_REP-»
+			<branchOnVariable variable="HttpResponseCode">
+				<branch value="500">
+«IF exceptionXQuery != null-»
+«EXPAND XQuery(environment, portBinding.port, operation, "Fault", exceptionXQuery)-»
+«ENDIF-»
+					<transform>
+«IF getPrivateServiceSignaturePortAdapter(portBinding.port).isExternalAndSOAP12()-»
+						<xquery><![CDATA[<soap:Fault xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+	<soap:Code><soap:Value>soap:Receiver</soap:Value></soap:Code>
+	<soap:Reason><soap:Text xml:lang="en">converted SOAP Fault</soap:Text></soap:Reason>
+	<soap:Detail>{.}</soap:Detail>
+</soap:Fault>]]></xquery>
+«ELSE-»
+						<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>converted SOAP Fault</faultstring><detail>{.}</detail></soapenv:Fault>]]></xquery>
+«ENDIF-»
+					</transform>
+				</branch>
+				<default>
+«EXPAND XQuery(environment, portBinding.port, operation, "Response", responseXQuery)-»
+				</default>
+			</branchOnVariable>
+«ELSEIF requestAckXQuery != null-»
+«EXPAND XQuery(environment, portBinding.port, operation, "RequestAck", requestAckXQuery)-»
+«ENDIF-»
+«ENDDEFINE»
+
+«DEFINE XQuery(Environment environment, Port port, WSDLOperation operation, String role, String xQuery) FOR XQueryReqRespPortAdapter-»
+«LET getTransformationResourceFileName(port, operation, role) + ".xq" AS xqFile-»
+«FILE artefactsDir(environment) + xqFile-»
+«IF xQuery != null && xQuery.length > 0-»
+«IF isLegacy(port) && xQuery.contains("fn-bea:")-»
+import module namespace fn-bea='http://osb-legacy-support' at '/modules/osb-legacy-support.xqm';
+«ENDIF-»
+«xQuery-»
+«ELSE-»
+«EXPAND XQuery3Template::Response(operation) FOR port-»
+«ENDIF-»
+«ENDFILE-»
+«IF isLegacy(port)-»
+«IF role == "Fault"-»
+					<assign>
+						<assignment variable="faultDetail1">detail/*</assignment>
+					</assign>
+«ELSE-»
+					<assign>
+«IF port.isUsingRequestForResponse(operation)-»
+						<bindName>request</bindName>
+						<assignment variable="«getInputElementQName(parseExternalWSDL(port), getOperationName(port, operation)).localPart.toFirstLower()»1">$request</assignment>
+«ENDIF-»
+						<assignment variable="«operation.NameX()»Resp1">.</assignment>
+					</assign>
+«ENDIF-»
+«ENDIF-»
+					<transform xqueryURI="«xqFile»"/>
+«ENDLET-»
+«ENDDEFINE»
+
+«DEFINE ResponseAdapter(Environment environment, PortBinding portBinding, WSDLOperation operation) FOR JavaReqRespPortAdapter-»
+«IF responseImplementationClass != null-»
+			<setMessage classLoader="/lib/«getQualifiedName()»">
+				<body javaType="«implementationClass»" method="«responseImplementationClass»">${body}</body>
+			</setMessage>
+«ENDIF-»
+«ENDDEFINE»

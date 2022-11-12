@@ -1,0 +1,21 @@
+{
+  "name": "xpt-to-ejs",
+  "version": "1.0.0",
+  "description": "Translate xpt to ejs",
+  "main": "index.js",
+  "repository": "https://github.com/h9h/xpt-to-ejs.git",
+  "author": "Michael <git@h9h.de>",
+  "license": "MIT",
+  "private": false,
+  "dependencies": {
+    "parsimmon": "^1.18.1",
+    "yargs": "^17.6.2"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1"
+  }
+}
