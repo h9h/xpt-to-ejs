@@ -227,9 +227,7 @@ exports[`Template 2 1`] = `
 exports[`Template xpt/WSDL-File-Async-Callback.xpt 1`] = `
 [
   {
-    "XtendInstruction": {
-      "substitution": "REM",
-    },
+    "XtendInstruction": "REM",
   },
   {
     "TemplateText": "
@@ -265,9 +263,7 @@ Generates the Async Response .wsdl-Files for a synchronous WSDLPortType
 ",
   },
   {
-    "XtendInstruction": {
-      "substitution": "REM",
-    },
+    "XtendInstruction": "REM",
   },
   {
     "TemplateText": "
@@ -474,9 +470,7 @@ Assumptions:
 			",
   },
   {
-    "XtendInstruction": {
-      "substitution": "REM",
-    },
+    "XtendInstruction": "REM",
   },
   {
     "TemplateText": " empty response "ack" for incoming Fault message ",
@@ -1336,6 +1330,1214 @@ Assumptions:
     "XtendInstruction": {
       "substitution": "ENDFILE",
     },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+",
+  },
+]
+`;
+
+exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
+[
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::foundation",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::content::core::iface",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::content::core::binding",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::content::core::infrastructure",
+    },
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "extension": "extensions::esb",
+    },
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "Log(Environment environment, WSDLOperation operation, int nr, String text) FOR PortBinding-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "hasToBeLogged(environment, operation, nr)-",
+    },
+  },
+  {
+    "TemplateText": "
+			<internalService serviceURI="/logging/InternalLog_",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "TemplateText": ""/>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "_Log(int nr, String textExpr) FOR Environment-",
+    },
+  },
+  {
+    "TemplateText": "
+			<fork copyMessage="false" workerPool="/logging/WorkerPool">
+				<setMessage clearAll="true">
+					<header name="MEP">\${MEP}</header>
+					<header name="LogPointNo">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "TemplateText": "</header>
+					<header name="Originator">ESB0</header>
+					<header name="Environment">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "NameX()",
+    },
+  },
+  {
+    "TemplateText": "</header>
+					<header name="Operation">\${operation}</header>
+					<header name="Service">\${serviceNamespace}</header>
+					<header name="LogTimeStamp">\${initialTimestamp}</header>
+					<body/>
+				</setMessage>
+				<assign contextItem="messageHeader">
+					<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+					<assignment header="Description">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "textExpr",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+					<assignment header="senderFQN">v1:senderFQN[1]/text()</assignment>
+					<assignment header="messageId">v1:messageId[1]/text()</assignment>
+					<assignment header="relatesToMessageId" nullable="true">v1:relatesToMessageId[1]/text()</assignment>
+					<assignment header="senderCurrentTimestampUTC">v1:senderCurrentTimestampUTC[1]/text()</assignment>
+					<assignment header="processInstanceId">v1:processInstanceId[1]/text()</assignment>
+					<assignment header="parentProcessInstanceId" nullable="true">v1:parentProcessInstanceId[1]/text()</assignment>
+				</assign>
+				<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getDashboardMessageTimeToLive()",
+    },
+  },
+  {
+    "TemplateText": "">
+					<jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+				</jms>
+			</fork>
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "LogWithMessage(Environment environment, WSDLOperation operation, int nr, String textExpr, String messageType, String faultCategory, String errorCode, String referenceExpr, String bindName) FOR PortBinding-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "hasToBeLogged(environment, operation, nr)-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "logMessage()-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "referenceExpr == null-",
+    },
+  },
+  {
+    "TemplateText": "
+			<internalService serviceURI="/logging/InternalLogWithMessage_",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getInternalLogServiceSuffix(messageType, bindName)",
+    },
+  },
+  {
+    "TemplateText": ""/>
+",
+  },
+  {
+    "XtendInstruction": "ELSE",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "expand": "_LogWithMessage(nr, textExpr, messageType, faultCategory, errorCode, referenceExpr, bindName, referenceExpr != null || nr == 53) FOR environment-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ELSE",
+  },
+  {
+    "TemplateText": "
+			<internalService serviceURI="/logging/InternalLog_",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "TemplateText": ""/>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "_LogWithMessage(int nr, String textExpr, String messageType, String faultCategory, String errorCode, String referenceExpr, String bindName, boolean needsMessage) FOR Environment-",
+    },
+  },
+  {
+    "TemplateText": "
+			<fork copyMessage="true" workerPool="/logging/WorkerPool">
+				<setMessage clearAll="true">
+					<header name="MEP">\${MEP}</header>
+					<header name="LogPointNo">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "TemplateText": "</header>
+					<header name="Originator">ESB0</header>
+					<header name="Environment">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "NameX()",
+    },
+  },
+  {
+    "TemplateText": "</header>
+					<header name="Operation">\${operation}</header>
+					<header name="Service">\${serviceNamespace}</header>
+					<header name="LogTimeStamp">\${initialTimestamp}</header>
+					<header name="MessageType">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "messageType",
+    },
+  },
+  {
+    "TemplateText": "</header>
+				</setMessage>
+				<assign",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!needsMessage",
+    },
+  },
+  {
+    "TemplateText": " contextItem="messageHeader"",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": ">
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage-",
+    },
+  },
+  {
+    "TemplateText": "
+					<bindName>messageHeader</bindName>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "referenceExpr != null && referenceExpr.contains("$header/")-",
+    },
+  },
+  {
+    "TemplateText": "
+					<bindName>header</bindName>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "bindName != null-",
+    },
+  },
+  {
+    "TemplateText": "
+					<bindName>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "bindName",
+    },
+  },
+  {
+    "TemplateText": "</bindName>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+					<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+					<assignment header="Description">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "textExpr",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+					<assignment header="senderFQN">",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage",
+    },
+  },
+  {
+    "TemplateText": "$messageHeader/",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "v1:senderFQN[1]/text()</assignment>
+					<assignment header="messageId">",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage",
+    },
+  },
+  {
+    "TemplateText": "$messageHeader/",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "v1:messageId[1]/text()</assignment>
+					<assignment header="relatesToMessageId" nullable="true">",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage",
+    },
+  },
+  {
+    "TemplateText": "$messageHeader/",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "v1:relatesToMessageId[1]/text()</assignment>
+					<assignment header="senderCurrentTimestampUTC">",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage",
+    },
+  },
+  {
+    "TemplateText": "$messageHeader/",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "v1:senderCurrentTimestampUTC[1]/text()</assignment>
+					<assignment header="processInstanceId">",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage",
+    },
+  },
+  {
+    "TemplateText": "$messageHeader/",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "v1:processInstanceId[1]/text()</assignment>
+					<assignment header="parentProcessInstanceId" nullable="true">",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "needsMessage",
+    },
+  },
+  {
+    "TemplateText": "$messageHeader/",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "v1:parentProcessInstanceId[1]/text()</assignment>
+					<assignment header="faultCategory">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "faultCategory",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+					<assignment header="errorCode">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "errorCode",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "referenceExpr != null-",
+    },
+  },
+  {
+    "TemplateText": "
+					<assignment header="Reference">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "referenceExpr",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+				</assign>
+				<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getDashboardMessageTimeToLive()",
+    },
+  },
+  {
+    "TemplateText": "">
+					<jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+				</jms>
+			</fork>
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "LogRejectedMessage(String mep, int nr, String text, String messageType, String errCode, String errMessage, String indent) FOR Environment-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<setMessage clearAll="true">
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="MEP">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "mep",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="LogPointNo">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="Originator">ESB0</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="Description">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "text",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="Environment">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "NameX()",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="Operation">\${operation}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="Service">\${serviceNamespace}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="LogTimeStamp">\${initialTimestamp}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<header name="MessageType">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "messageType",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			</setMessage>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory">
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<jndiDestination>java:comp/env/jms/DashboardRejectedMessageQueue</jndiDestination>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			</jms>
+",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "errCode != null-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<transform>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "errCode",
+    },
+  },
+  {
+    "TemplateText": ": ",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "errMessage",
+    },
+  },
+  {
+    "TemplateText": "</faultstring></soapenv:Fault>]]></xquery>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			</transform>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<setMessage>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "				<variable name="HttpResponseCode" javaType="java.lang.Integer">500</variable>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			</setMessage>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<wrapSOAP/>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "LogUndeliveredMessage(String messageType, String errCode, String errMessage, String indent) FOR Environment-",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		<setMessage clearAll="true">
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="MEP">\${MEP}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="Environment">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "NameX()",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="Operation">\${operation}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="Service">\${serviceNamespace}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="LogTimeStamp">\${initialTimestamp}</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="Originator">ESB0</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<header name="MessageType">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "messageType",
+    },
+  },
+  {
+    "TemplateText": "</header>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		</setMessage>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		<assign>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<bindName>messageHeader</bindName>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="senderFQN">$messageHeader/v1:senderFQN[1]/text()</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="messageId">$messageHeader/v1:messageId[1]/text()</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="relatesToMessageId" nullable="true">$messageHeader/v1:relatesToMessageId[1]/text()</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="senderCurrentTimestampUTC">$messageHeader/v1:senderCurrentTimestampUTC[1]/text()</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="processInstanceId">$messageHeader/v1:processInstanceId[1]/text()</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="parentProcessInstanceId" nullable="true">$messageHeader/v1:parentProcessInstanceId[1]/text()</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="errorCode">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "errCode",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<assignment header="reason">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "errMessage",
+    },
+  },
+  {
+    "TemplateText": "</assignment>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		</assign>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		<transform>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<xquery>declare variable $_request as element() external; $_request</xquery>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		</transform>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory">
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "			<jndiDestination>java:comp/env/jms/DashboardUndeliveredMessageQueue</jndiDestination>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		</jms>
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "TemplateText": "		<internalService serviceURI="/logging/InternalLog_44"/>
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "DashboardService(Environment environment) FOR PortBinding",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "let": "port.component.parent.name AS appName",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "enlist({}, getWorkerCount()) AS nr",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "file": "artefactsDir(environment) + "/logging/" + appName + "Dashboard" + nr + ".xservice"-",
+    },
+  },
+  {
+    "TemplateText": "
+<service protocol="jms" version="1" xmlns="http://www.artofarc.com/esb/service">
+	<jmsBinding jndiConnectionFactory="java:comp/env/",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getCFName(environment, port)",
+    },
+  },
+  {
+    "TemplateText": "" workerPool="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "appName",
+    },
+  },
+  {
+    "TemplateText": "Dashboard",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "nr",
+    },
+  },
+  {
+    "TemplateText": "">
+		<queueName>InternalDashboardR01</queueName>
+	</jmsBinding>
+	<transform>
+		<xquery>declare namespace soapenv="http://schemas.xmlsoap.org/soap/envelope/"; soapenv:Envelope[1]/soapenv:Body[1]/*[1]</xquery>
+	</transform>
+	<assign clearAll="true">
+		<bindName>JMSTimestamp</bindName>
+		<nsDecl namespace="http://svi.de/xsd/ei/internal/dashboard/v1" prefix="v1"/>
+		<assignment header="Environment">'",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "NameX(environment)",
+    },
+  },
+  {
+    "TemplateText": "'</assignment>
+		<assignment header="LogTimeStamp">$JMSTimestamp</assignment>
+		<assignment header="senderFQN">v1:senderFQN[1]/text()</assignment>
+		<assignment header="messageId">v1:messageId[1]/text()</assignment>
+		<assignment header="relatesToMessageId" nullable="true">v1:relatesToMessageId[1]/text()</assignment>
+		<assignment header="senderCurrentTimestampUTC">v1:senderCurrentTimestampUTC[1]/text()</assignment>
+		<assignment header="processInstanceId">v1:processInstanceId[1]/text()</assignment>
+		<assignment header="parentProcessInstanceId" nullable="true">v1:parentProcessInstanceId[1]/text()</assignment>
+		<assignment header="Service">v1:service[1]/text()</assignment>
+		<assignment header="Operation">v1:operation[1]/text()</assignment>
+		<assignment header="LogPointNo">v1:logpointNo[1]/text()</assignment>
+		<assignment header="Description">v1:description[1]/text()</assignment>
+		<assignment header="MEP">if (v1:mep[1] and v1:mep[1] != 'sync') then v1:mep[1]/text() else 'requestReply'</assignment>
+		<assignment header="Originator">if (v1:originator[1]) then v1:originator[1]/text() else '",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "appName.truncate(5)",
+    },
+  },
+  {
+    "TemplateText": "'</assignment>
+	</assign>
+	<setMessage>
+		<body/>
+	</setMessage>
+	<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getDashboardMessageTimeToLive()",
+    },
+  },
+  {
+    "TemplateText": "">
+		<jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+	</jms>
+</service>
+",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ENDFILE",
+    },
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "file": "artefactsDir(environment) + "/logging/" + appName + "Dashboard" + nr + ".wpdef"-",
+    },
+  },
+  {
+    "TemplateText": "
+<workerPool minThreads="0" maxThreads="5" queueDepth="0" scheduledThreads="0" allowCoreThreadTimeOut="true" xmlns="http://www.artofarc.com/esb/service"/>
+",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ENDFILE",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDLET",
   },
   {
     "TemplateText": "

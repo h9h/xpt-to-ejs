@@ -70,11 +70,20 @@ test('Template 2', () => {
   expect(Xpt.Template.tryParse(template)).toMatchSnapshot()
 })
 
-  test('Template xpt/WSDL-File-Async-Callback.xpt', () => {
+test('Template xpt/WSDL-File-Async-Callback.xpt', () => {
     const template = fs.readFileSync(
       path.resolve(__dirname, '../xpt/WSDL-File-Async-Callback.xpt'),
       { encoding: 'utf-8' }
     )
 
     expect(Xpt.Template.tryParse(template)).toMatchSnapshot()
-  })
+})
+
+test('Template xpt/esb0/Dashboard.xpt', () => {
+    const template = fs.readFileSync(
+      path.resolve(__dirname, '../xpt/esb0/Dashboard.xpt'),
+      { encoding: 'utf-8' }
+    )
+
+    expect(Xpt.Template.tryParse(template)).toMatchSnapshot()
+})

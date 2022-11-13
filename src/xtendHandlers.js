@@ -7,7 +7,7 @@
 // --------------------------------------
 const SKIP = { skip: true, result: null }
 
-const removeTrailingMinus = s => s.charAt(s.length-1) === '-' ? s.substring(0,s.length-2) : s
+const removeTrailingMinus = s => s.charAt(s.length-1) === '-' ? s.substring(0,s.length-1) : s
 const makeResult = result => ({ skip: false, result })
 
 // template function corpus
@@ -43,7 +43,7 @@ const h_else = xtend => {
 const h_endif = xtend => {
   if(xtend !== 'ENDIF') return SKIP
   return makeResult({
-    ejs: '<% } %>',
+    ejs: '<% } /* end-if */ %>',
   })
 }
 
@@ -126,7 +126,30 @@ const h_let = xtend => {
 const h_endlet = xtend => {
   if(xtend !== 'ENDLET') return SKIP
   return makeResult({
-    ejs: '<% } %>',
+    ejs: '<% } /* end-let */ %>',
+  })
+}
+
+const h_define = xtend => {
+  if(!xtend.define) return SKIP
+  const value = removeTrailingMinus(xtend.define)
+  try {
+    const [expression, variable] = value.split(" FOR ")
+    return makeResult({
+      ejs: `<%# TODO: DEFINE Method "${variable}" on type "${expression}" %><% { %>}`,
+      instruction: `[DEFINE] Handle method definition: ${value}`
+    })
+  } catch (e) {
+    return makeResult({
+      ejs: `<%# TODO: DEFINE Method "${value}" %><% { %>`,
+      instruction: `[DEFINE] Unresolved method definition: ${value}`
+    })
+  }
+}
+const h_enddefine = xtend => {
+  if(xtend !== 'ENDDEFINE') return SKIP
+  return makeResult({
+    ejs: '<% } /* end-define */ %>',
   })
 }
 
@@ -149,7 +172,7 @@ const h_foreach = xtend => {
 const h_endforeach = xtend => {
   if(xtend !== 'ENDFOREACH') return SKIP
   return makeResult({
-    ejs: '<% } %>',
+    ejs: '<% } /* end-forEach */ %>',
   })
 }
 
@@ -197,6 +220,8 @@ const XtendHandlers = [
   h_file,
   h_let,
   h_endlet,
+  h_define,
+  h_enddefine,
   h_foreach,
   h_endforeach,
   h_error,

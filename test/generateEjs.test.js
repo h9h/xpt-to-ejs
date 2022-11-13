@@ -10,9 +10,9 @@ test('just if', () => {
   ]
 
   expect(generateEjs(ast)).toEqual({
-    ejs: "<%if (referenceExpr != nul) {%>",
+    ejs: "<%if (referenceExpr != null) {%>",
     error: [],
-    instructions: ['Resolve "referenceExpr != nul"']
+    instructions: ['Resolve "referenceExpr != null"']
   })
 })
 

@@ -102,13 +102,11 @@ const Xpt = P.createLanguage({
   ),
   XtendEndDefine:     r => r.ENDDEFINE,
 
-  // «LET getPrivateServiceSignaturePortAdapter(port) AS externalInterface»
-  XtendRem:       r => P.seqObj(
-    r.REM,
-    ['remark', r.TextInFrench]
-  ),
-  XtendEndRem:  r => r.ENDREM,
-  XtendIndent:  r => r.INDENT,
+  // «REM»
+  XtendRem:       r => r.REM,
+  XtendEndRem:    r => r.ENDREM,
+
+  XtendIndent:    r => r.INDENT,
 
   // «getRequestHeaderElements(portBinding.port, operation).first().localPart
   XtendSubstitution:  r => P.seqObj(
