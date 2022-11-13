@@ -1,0 +1,198 @@
+«IMPORT com::tmobile::ei::sbp::mm::foundation»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::iface»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::binding»
+«IMPORT com::tmobile::ei::sbp::mm::content::core::infrastructure»
+
+«EXTENSION extensions::esb»
+
+«DEFINE Log(Environment environment, WSDLOperation operation, int nr, String text) FOR PortBinding-»
+«IF hasToBeLogged(environment, operation, nr)-»
+			<internalService serviceURI="/logging/InternalLog_«nr»"/>
+«ENDIF-»
+«ENDDEFINE»
+
+«DEFINE _Log(int nr, String textExpr) FOR Environment-»
+			<fork copyMessage="false" workerPool="/logging/WorkerPool">
+				<setMessage clearAll="true">
+					<header name="MEP">${MEP}</header>
+					<header name="LogPointNo">«nr»</header>
+					<header name="Originator">ESB0</header>
+					<header name="Environment">«NameX()»</header>
+					<header name="Operation">${operation}</header>
+					<header name="Service">${serviceNamespace}</header>
+					<header name="LogTimeStamp">${initialTimestamp}</header>
+					<body/>
+				</setMessage>
+				<assign contextItem="messageHeader">
+					<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+					<assignment header="Description">«textExpr»</assignment>
+					<assignment header="senderFQN">v1:senderFQN[1]/text()</assignment>
+					<assignment header="messageId">v1:messageId[1]/text()</assignment>
+					<assignment header="relatesToMessageId" nullable="true">v1:relatesToMessageId[1]/text()</assignment>
+					<assignment header="senderCurrentTimestampUTC">v1:senderCurrentTimestampUTC[1]/text()</assignment>
+					<assignment header="processInstanceId">v1:processInstanceId[1]/text()</assignment>
+					<assignment header="parentProcessInstanceId" nullable="true">v1:parentProcessInstanceId[1]/text()</assignment>
+				</assign>
+				<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="«getDashboardMessageTimeToLive()»">
+					<jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+				</jms>
+			</fork>
+«ENDDEFINE»
+
+«DEFINE LogWithMessage(Environment environment, WSDLOperation operation, int nr, String textExpr, String messageType, String faultCategory, String errorCode, String referenceExpr, String bindName) FOR PortBinding-»
+«IF hasToBeLogged(environment, operation, nr)-»
+«IF logMessage()-»
+«IF referenceExpr == null-»
+			<internalService serviceURI="/logging/InternalLogWithMessage_«nr»«getInternalLogServiceSuffix(messageType, bindName)»"/>
+«ELSE-»
+«EXPAND _LogWithMessage(nr, textExpr, messageType, faultCategory, errorCode, referenceExpr, bindName, referenceExpr != null || nr == 53) FOR environment-»
+«ENDIF-»
+«ELSE-»
+			<internalService serviceURI="/logging/InternalLog_«nr»"/>
+«ENDIF-»
+«ENDIF-»
+«ENDDEFINE»
+
+«DEFINE _LogWithMessage(int nr, String textExpr, String messageType, String faultCategory, String errorCode, String referenceExpr, String bindName, boolean needsMessage) FOR Environment-»
+			<fork copyMessage="true" workerPool="/logging/WorkerPool">
+				<setMessage clearAll="true">
+					<header name="MEP">${MEP}</header>
+					<header name="LogPointNo">«nr»</header>
+					<header name="Originator">ESB0</header>
+					<header name="Environment">«NameX()»</header>
+					<header name="Operation">${operation}</header>
+					<header name="Service">${serviceNamespace}</header>
+					<header name="LogTimeStamp">${initialTimestamp}</header>
+					<header name="MessageType">«messageType»</header>
+				</setMessage>
+				<assign«IF !needsMessage» contextItem="messageHeader"«ENDIF»>
+«IF needsMessage-»
+					<bindName>messageHeader</bindName>
+«ENDIF-»
+«IF referenceExpr != null && referenceExpr.contains("$header/")-»
+					<bindName>header</bindName>
+«ENDIF-»
+«IF bindName != null-»
+					<bindName>«bindName»</bindName>
+«ENDIF-»
+					<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+					<assignment header="Description">«textExpr»</assignment>
+					<assignment header="senderFQN">«IF needsMessage»$messageHeader/«ENDIF»v1:senderFQN[1]/text()</assignment>
+					<assignment header="messageId">«IF needsMessage»$messageHeader/«ENDIF»v1:messageId[1]/text()</assignment>
+					<assignment header="relatesToMessageId" nullable="true">«IF needsMessage»$messageHeader/«ENDIF»v1:relatesToMessageId[1]/text()</assignment>
+					<assignment header="senderCurrentTimestampUTC">«IF needsMessage»$messageHeader/«ENDIF»v1:senderCurrentTimestampUTC[1]/text()</assignment>
+					<assignment header="processInstanceId">«IF needsMessage»$messageHeader/«ENDIF»v1:processInstanceId[1]/text()</assignment>
+					<assignment header="parentProcessInstanceId" nullable="true">«IF needsMessage»$messageHeader/«ENDIF»v1:parentProcessInstanceId[1]/text()</assignment>
+					<assignment header="faultCategory">«faultCategory»</assignment>
+					<assignment header="errorCode">«errorCode»</assignment>
+«IF referenceExpr != null-»
+					<assignment header="Reference">«referenceExpr»</assignment>
+«ENDIF-»
+				</assign>
+				<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="«getDashboardMessageTimeToLive()»">
+					<jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+				</jms>
+			</fork>
+«ENDDEFINE»
+
+«DEFINE LogRejectedMessage(String mep, int nr, String text, String messageType, String errCode, String errMessage, String indent) FOR Environment-»
+«indent»			<setMessage clearAll="true">
+«indent»				<header name="MEP">«mep»</header>
+«indent»				<header name="LogPointNo">«nr»</header>
+«indent»				<header name="Originator">ESB0</header>
+«indent»				<header name="Description">«text»</header>
+«indent»				<header name="Environment">«NameX()»</header>
+«indent»				<header name="Operation">${operation}</header>
+«indent»				<header name="Service">${serviceNamespace}</header>
+«indent»				<header name="LogTimeStamp">${initialTimestamp}</header>
+«indent»				<header name="MessageType">«messageType»</header>
+«indent»			</setMessage>
+«indent»			<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory">
+«indent»				<jndiDestination>java:comp/env/jms/DashboardRejectedMessageQueue</jndiDestination>
+«indent»			</jms>
+«IF errCode != null-»
+«indent»			<transform>
+«indent»				<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>«errCode»: «errMessage»</faultstring></soapenv:Fault>]]></xquery>
+«indent»			</transform>
+«indent»			<setMessage>
+«indent»				<variable name="HttpResponseCode" javaType="java.lang.Integer">500</variable>
+«indent»			</setMessage>
+«indent»			<wrapSOAP/>
+«ENDIF-»
+«ENDDEFINE»
+
+«DEFINE LogUndeliveredMessage(String messageType, String errCode, String errMessage, String indent) FOR Environment-»
+«indent»		<setMessage clearAll="true">
+«indent»			<header name="MEP">${MEP}</header>
+«indent»			<header name="Environment">«NameX()»</header>
+«indent»			<header name="Operation">${operation}</header>
+«indent»			<header name="Service">${serviceNamespace}</header>
+«indent»			<header name="LogTimeStamp">${initialTimestamp}</header>
+«indent»			<header name="Originator">ESB0</header>
+«indent»			<header name="MessageType">«messageType»</header>
+«indent»		</setMessage>
+«indent»		<assign>
+«indent»			<bindName>messageHeader</bindName>
+«indent»			<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
+«indent»			<assignment header="senderFQN">$messageHeader/v1:senderFQN[1]/text()</assignment>
+«indent»			<assignment header="messageId">$messageHeader/v1:messageId[1]/text()</assignment>
+«indent»			<assignment header="relatesToMessageId" nullable="true">$messageHeader/v1:relatesToMessageId[1]/text()</assignment>
+«indent»			<assignment header="senderCurrentTimestampUTC">$messageHeader/v1:senderCurrentTimestampUTC[1]/text()</assignment>
+«indent»			<assignment header="processInstanceId">$messageHeader/v1:processInstanceId[1]/text()</assignment>
+«indent»			<assignment header="parentProcessInstanceId" nullable="true">$messageHeader/v1:parentProcessInstanceId[1]/text()</assignment>
+«indent»			<assignment header="errorCode">«errCode»</assignment>
+«indent»			<assignment header="reason">«errMessage»</assignment>
+«indent»		</assign>
+«indent»		<transform>
+«indent»			<xquery>declare variable $_request as element() external; $_request</xquery>
+«indent»		</transform>
+«indent»		<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory">
+«indent»			<jndiDestination>java:comp/env/jms/DashboardUndeliveredMessageQueue</jndiDestination>
+«indent»		</jms>
+«indent»		<internalService serviceURI="/logging/InternalLog_44"/>
+«ENDDEFINE»
+
+«DEFINE DashboardService(Environment environment) FOR PortBinding»
+«LET port.component.parent.name AS appName»
+«FOREACH enlist({}, getWorkerCount()) AS nr»
+«FILE artefactsDir(environment) + "/logging/" + appName + "Dashboard" + nr + ".xservice"-»
+<service protocol="jms" version="1" xmlns="http://www.artofarc.com/esb/service">
+	<jmsBinding jndiConnectionFactory="java:comp/env/«getCFName(environment, port)»" workerPool="«appName»Dashboard«nr»">
+		<queueName>InternalDashboardR01</queueName>
+	</jmsBinding>
+	<transform>
+		<xquery>declare namespace soapenv="http://schemas.xmlsoap.org/soap/envelope/"; soapenv:Envelope[1]/soapenv:Body[1]/*[1]</xquery>
+	</transform>
+	<assign clearAll="true">
+		<bindName>JMSTimestamp</bindName>
+		<nsDecl namespace="http://svi.de/xsd/ei/internal/dashboard/v1" prefix="v1"/>
+		<assignment header="Environment">'«NameX(environment)»'</assignment>
+		<assignment header="LogTimeStamp">$JMSTimestamp</assignment>
+		<assignment header="senderFQN">v1:senderFQN[1]/text()</assignment>
+		<assignment header="messageId">v1:messageId[1]/text()</assignment>
+		<assignment header="relatesToMessageId" nullable="true">v1:relatesToMessageId[1]/text()</assignment>
+		<assignment header="senderCurrentTimestampUTC">v1:senderCurrentTimestampUTC[1]/text()</assignment>
+		<assignment header="processInstanceId">v1:processInstanceId[1]/text()</assignment>
+		<assignment header="parentProcessInstanceId" nullable="true">v1:parentProcessInstanceId[1]/text()</assignment>
+		<assignment header="Service">v1:service[1]/text()</assignment>
+		<assignment header="Operation">v1:operation[1]/text()</assignment>
+		<assignment header="LogPointNo">v1:logpointNo[1]/text()</assignment>
+		<assignment header="Description">v1:description[1]/text()</assignment>
+		<assignment header="MEP">if (v1:mep[1] and v1:mep[1] != 'sync') then v1:mep[1]/text() else 'requestReply'</assignment>
+		<assignment header="Originator">if (v1:originator[1]) then v1:originator[1]/text() else '«appName.truncate(5)»'</assignment>
+	</assign>
+	<setMessage>
+		<body/>
+	</setMessage>
+	<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="«getDashboardMessageTimeToLive()»">
+		<jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+	</jms>
+</service>
+«ENDFILE»
+
+«FILE artefactsDir(environment) + "/logging/" + appName + "Dashboard" + nr + ".wpdef"-»
+<workerPool minThreads="0" maxThreads="5" queueDepth="0" scheduledThreads="0" allowCoreThreadTimeOut="true" xmlns="http://www.artofarc.com/esb/service"/>
+«ENDFILE»
+«ENDFOREACH»
+«ENDLET»
+«ENDDEFINE»

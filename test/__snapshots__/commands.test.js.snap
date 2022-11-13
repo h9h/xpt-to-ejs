@@ -1,0 +1,69 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Parse input template 1`] = `
+[
+  {
+    "XtendInstruction": {
+      "bedingung": "referenceExpr != null-",
+    },
+  },
+  {
+    "template text": "
+  <assignment header="Reference">",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "referenceExpr",
+    },
+  },
+  {
+    "template text": "</assignment>
+",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "template text": "
+</assign>
+<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getDashboardMessageTimeToLive()",
+    },
+  },
+  {
+    "template text": "">
+  <jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+</jms>
+</fork>
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "template text": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "LogRejectedMessage(String mep, int nr, String text, String messageType, String errCode, String errMessage, String indent) FOR Environment-",
+    },
+  },
+  {
+    "template text": "
+",
+  },
+  {
+    "XtendInstruction": "indent",
+  },
+  {
+    "template text": "			<setMessage clearAll="true">
+
+  ",
+  },
+]
+`;

@@ -1,0 +1,170 @@
+«REM»
+Generates the Async Response .wsdl-Files for a synchronous WSDLPortType
+=> async (Consumer) / sync (Provider) mapping
+«ENDREM»
+
+«IMPORT com::tmobile::ei::sbp::mm::content::core::iface»
+
+«EXTENSION extensions::osb»
+«REM»
+Assumptions:
+- default-namespace in wsdl:definitions is always "http://schemas.xmlsoap.org/wsdl/"
+  AND IGNORED by Importer (so we include default-namespace hardcoded here)
+- prefixes "wsdl" and "soap"
+  AND IGNORED by Importer (so we include them hardcoded here)
+«ENDREM»
+«DEFINE Root(String baseDir, String relDir, boolean abstract, boolean inline, boolean oneWay) FOR WSDLPortType»
+	«FILE baseDir + (relDir != null ? '/' + relDir.ensureEndsWithSlash() : '/') + WsdlFile("_Callback")»<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+		name="«NameX()»Definitions"
+		targetNamespace="«TargetNamespaceUri()»"
+		xmlns:tns="«TargetNamespaceUri()»"
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	>
+	<!-- CEISeR version of WSDLPortType: «validFromVersion» (Branch: «connectionToken.branch») -->
+	<!-- version: «Version()» -->
+	«IF targetNamespace.description != null-»
+	<wsdl:documentation>«escapeXml(targetNamespace.description)»</wsdl:documentation>
+	«ENDIF-»
+	<wsdl:types>
+	«IF inline-»
+		«FOREACH RecursiveReferencedNamespaceNotWellKnownOrOwn() AS currentNamespace-»
+			«EXPAND XmlSchema::Root(this, relDir != null ? relDir.ensureEndsWithSlash() + Directory() : Directory(), inline) FOR currentNamespace»
+		</xsd:schema>
+		«ENDFOREACH-»
+	«ENDIF-»
+		«EXPAND XmlSchema::Root(this, relDir != null ? relDir.ensureEndsWithSlash() + Directory() : Directory(), inline) FOR targetNamespace»
+			«LET UsedPrefixes(targetNamespace).selectFirst(e|e.serviceNamespace.URI == getFoundationNamespaceURI()) AS eiPrefix -»
+			«FOREACH operations.reject(e|e.isCheckAlive()) AS operation -»
+			<xsd:element name="«ResponseElementName(operation)»Acknowledge" type="«eiPrefix.NameX()»:acknowledgeRespType"/>
+			«REM» empty response "ack" for incoming Fault message «ENDREM»
+			<xsd:element name="«operation.NameX()»«getPostFixAsyncFaultOperation()»" type="«eiPrefix.NameX()»:mepMappingFaultToBodyType"/>
+			«ENDFOREACH-»
+			«ENDLET-»
+		</xsd:schema>
+	</wsdl:types>
+	<!-- ****************************************************************** -->
+	«FOREACH operations AS operation -»
+	«IF operation.isCheckAlive()-»
+	«FOREACH operation.UsedMessages() AS message-»
+	<wsdl:message name="«message.NameX()»">
+		«IF message.description != null-»
+		<wsdl:documentation>«escapeXml(description)»</wsdl:documentation>
+		«ENDIF-»
+		«FOREACH message.parts AS part-»
+		<wsdl:part name="«part.NameX()»" element="tns:«part.messageType.NameX()»" />
+		«ENDFOREACH-»
+	</wsdl:message>
+	«ENDFOREACH-»
+	«ELSE-»
+	«LET operation.output.message AS message-»
+	<wsdl:message name="«message.NameX()»">
+		«IF message.description != null-»
+		<wsdl:documentation>«escapeXml(description)»</wsdl:documentation>
+		«ENDIF-»
+		«FOREACH (Collection[WSDLMessagePart])message.parts AS part -»
+		<wsdl:part name="«part.NameX()»" element="tns:«part.messageType.NameX()»" />
+		«ENDFOREACH -»
+	</wsdl:message>
+	<wsdl:message name="«operation.NameX()»«getPostFixAsyncFaultOperation()»">
+		<wsdl:part name="parameters" element="tns:«operation.NameX()»«getPostFixAsyncFaultOperation()»" />
+	</wsdl:message>
+	<wsdl:message name="«message.NameX()»_Output">
+		<wsdl:part name="parameters" element="tns:«ResponseElementName(operation)»Acknowledge" />
+	</wsdl:message>
+	<wsdl:message name="«message.NameX()»_Fault">
+		<wsdl:part name="fault" element="tns:FaultDetail" />
+	</wsdl:message>
+	«ENDLET-»
+	«ENDIF-»
+	«ENDFOREACH -»
+	<!-- ****************************************************************** -->
+	<wsdl:portType name="«WsdlPortTypeName()»Callback">
+		«IF description != null-»
+		<wsdl:documentation>«escapeXml(description)»</wsdl:documentation>
+		«ENDIF-»
+		«FOREACH operations.reject(e|e.isCheckAlive()) AS operation -»
+		<wsdl:operation name="«ResponseElementName(operation)»">
+			«IF operation.description != null-»
+			<wsdl:documentation>«escapeXml(operation.description)»</wsdl:documentation>
+			«ENDIF-»
+			<wsdl:input«IF !operation.isInputLogicallyNameless()» name="«operation.output.NameX()»"«ENDIF» message="tns:«operation.output.message.NameX()»" />
+			«IF !oneWay-»
+			<wsdl:output message="tns:«operation.output.message.NameX()»_Output" />
+			<wsdl:fault message="tns:«operation.output.message.NameX()»_Fault" name="TechnicalExceptionFault" />
+			«ENDIF-»
+		</wsdl:operation>
+		<wsdl:operation name="«operation.NameX()»«getPostFixAsyncFaultOperation()»">
+			«IF operation.description != null-»
+			<wsdl:documentation>«escapeXml(operation.description)»</wsdl:documentation>
+			«ENDIF-»
+			<wsdl:input message="tns:«operation.NameX()»«getPostFixAsyncFaultOperation()»" />
+			«IF !oneWay-»
+			<wsdl:output message="tns:«operation.output.message.NameX()»_Output" />
+			<wsdl:fault message="tns:«operation.output.message.NameX()»_Fault" name="TechnicalExceptionFault" />
+			«ENDIF-»
+		</wsdl:operation>
+		«ENDFOREACH -»
+		«LET operations.selectFirst(e|e.isCheckAlive()) AS operation-»
+		«IF operation != null-»
+		<wsdl:operation name="«operation.NameX()»">
+			«EXPAND WsdlFile::AbstractOperationContent(oneWay) FOR operation-»
+		</wsdl:operation>
+		«ENDIF-»
+		«ENDLET-»
+	</wsdl:portType>
+	«IF !abstract -»
+	<!-- ****************************************************************** -->
+	<wsdl:binding name="«WsdlPortTypeName()»CallbackBinding" type="tns:«WsdlPortTypeName()»Callback">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		«FOREACH operations.reject(e|e.isCheckAlive()) AS operation -»
+		<wsdl:operation name="«ResponseElementName(operation)»">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			«IF !oneWay-»
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="TechnicalExceptionFault">
+				<soap:fault name="TechnicalExceptionFault" use="literal" />
+			</wsdl:fault>
+			«ENDIF-»
+		</wsdl:operation>
+		<wsdl:operation name="«operation.NameX()»«getPostFixAsyncFaultOperation()»">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			«IF !oneWay-»
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="TechnicalExceptionFault">
+				<soap:fault name="TechnicalExceptionFault" use="literal" />
+			</wsdl:fault>
+			«ENDIF-»
+		</wsdl:operation>
+		«ENDFOREACH -»
+		«LET operations.selectFirst(e|e.isCheckAlive()) AS operation-»
+		«IF operation != null-»
+		<wsdl:operation name="«operation.NameX()»">
+			<soap:operation«IF operation.soapAction != null» soapAction="«operation.soapAction»"«ELSE» soapAction=""«ENDIF»/>
+			«EXPAND WsdlFile::BindingOperationContent(oneWay) FOR operation-»
+		</wsdl:operation>
+		«ENDIF-»
+		«ENDLET-»
+	</wsdl:binding>
+	<!-- ****************************************************************** -->
+	<wsdl:service name="«WsdlPortTypeName()»CallbackService">
+		<wsdl:port name="«WsdlPortTypeName()»Callback" binding="tns:«WsdlPortTypeName()»CallbackBinding">
+			<soap:address location="«DummyServicePortAddressLocationPrefix()»" />
+		</wsdl:port>
+	</wsdl:service>
+	«ENDIF -»
+</wsdl:definitions>
+	«ENDFILE»
+«ENDDEFINE»

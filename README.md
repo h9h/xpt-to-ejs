@@ -17,6 +17,9 @@
 «ENDFOREACH-» == <% }) %>
 «ERROR string» == <% throw 'string' %>
 ```
+More Xtend instructions:
+
+REM/ENDREM - Comments
 
 ## Grammar
 

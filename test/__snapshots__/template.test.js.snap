@@ -7,64 +7,97 @@ exports[`Template 1 1`] = `
       "import": "com::tmobile::ei::sbp::mm::content::core::binding",
     },
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": {
       "import": "com::tmobile::ei::sbp::mm::content::core::infrastructure",
     },
   },
-  null,
-  null,
+  {
+    "template text": "
+
+",
+  },
   {
     "XtendInstruction": {
       "extension": "extensions::esb",
     },
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": {
       "extension": "extensions::wsdl",
     },
   },
-  null,
-  null,
+  {
+    "template text": "
+
+",
+  },
   {
     "XtendInstruction": {
       "define": "Root(Environment environment) FOR PortBinding",
     },
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": "ENDDEFINE",
   },
-  null,
-  null,
+  {
+    "template text": "
+
+",
+  },
   {
     "XtendInstruction": {
       "define": "Root(Environment environment) FOR UsingPortBinding",
     },
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": {
       "bedingung": "!hasRESTPort(usingPort.getUsingPort()) && !isNotificationPort(usingPort) && ConnectedProvider(environment) != null",
     },
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": {
       "expand": "Root(environment, "/consumer/", usingPort.portType, ConnectedProvider(environment))",
     },
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": "ENDIF",
   },
-  null,
+  {
+    "template text": "
+",
+  },
   {
     "XtendInstruction": "ENDDEFINE",
   },
-  null,
+  {
+    "template text": "
+  ",
+  },
 ]
 `;
 
@@ -76,7 +109,8 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "<service protocol="jms" errorHandler="jmsErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
+    "template text": "
+  <service protocol="jms" errorHandler="jmsErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
     <jmsBinding jndiConnectionFactory="java:comp/env/",
   },
   {
@@ -116,14 +150,16 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "</actionPipeline>
+    "template text": "
+    </actionPipeline>
   ",
   },
   {
     "XtendInstruction": "ELSE",
   },
   {
-    "template text": "<service protocol="http" errorHandler="soapErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
+    "template text": "
+  <service protocol="http" errorHandler="soapErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
     <httpBindURI",
   },
   {
@@ -137,7 +173,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "multipartResponse="application/xop+xml"",
+    "template text": " multipartResponse="application/xop+xml"",
   },
   {
     "XtendInstruction": "ENDIF",
@@ -162,7 +198,8 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "<xquery><![CDATA[<soap:Fault xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
+    "template text": "
+        <xquery><![CDATA[<soap:Fault xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
     <soap:Code><soap:Value>soap:Receiver</soap:Value></soap:Code>
     <soap:Reason><soap:Text xml:lang="en">{exception/message/text()}</soap:Text></soap:Reason>
     <soap:Detail>{exception/cause}</soap:Detail>
@@ -173,12 +210,16 @@ exports[`Template 2 1`] = `
     "XtendInstruction": "ELSE",
   },
   {
-    "template text": "<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>{exception/message/text()}</faultstring><detail>{exception/cause}</detail></soapenv:Fault>]]></xquery>
+    "template text": "
+        <xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>{exception/message/text()}</faultstring><detail>{exception/cause}</detail></soapenv:Fault>]]></xquery>
   ",
   },
   {
     "XtendInstruction": "ENDIF",
   },
-  null,
+  {
+    "template text": "
+    ",
+  },
 ]
 `;

@@ -23,11 +23,15 @@ const Xpt = P.createLanguage({
   ENDLET:       () => P.string('ENDLET'),
   ERROR:        () => P.string('ERROR'),
   FILE:         () => P.string('FILE'),
+  ENDFILE:      () => P.string('ENDFILE'),
+  REM:          () => P.string('REM'),
+  ENDREM:       () => P.string('ENDREM'),
+  INDENT:       () => P.string('indent'),
 
   // Parts
   TextInFrench: r => P.regexp(/[^»]+/).trim(_),
   TemplateText: () => P.seqObj(
-    ['template text', P.regexp(/[^«»]+/).trim(_)]
+    ['template text', P.regexp(/[^«»]+/)]
   ),
 
 
@@ -68,6 +72,7 @@ const Xpt = P.createLanguage({
     r.FILE,
     ['file', r.TextInFrench],
   ),
+  XtendEndFile:  r => r.ENDFILE,
 
   // «LET getPrivateServiceSignaturePortAdapter(port) AS externalInterface»
   XtendLet:       r => P.seqObj(
@@ -97,6 +102,14 @@ const Xpt = P.createLanguage({
   ),
   XtendEndDefine:     r => r.ENDDEFINE,
 
+  // «LET getPrivateServiceSignaturePortAdapter(port) AS externalInterface»
+  XtendRem:       r => P.seqObj(
+    r.REM,
+    ['remark', r.TextInFrench]
+  ),
+  XtendEndRem:  r => r.ENDREM,
+  XtendIndent:  r => r.INDENT,
+
   // «getRequestHeaderElements(portBinding.port, operation).first().localPart
   XtendSubstitution:  r => P.seqObj(
     ['substitution', r.TextInFrench]
@@ -122,6 +135,9 @@ const Xpt = P.createLanguage({
       r.XtendError,
       r.XtendDefine,
       r.XtendEndDefine,
+      r.XtendRem,
+      r.XtendEndRem,
+      r.XtendIndent,
       // least specific --> last parser option
       r.XtendSubstitution,
     )],
@@ -134,7 +150,6 @@ const Xpt = P.createLanguage({
   Instruction: r => P.alt(
     r.XtendInstruction,
     r.TemplateText,
-    P.end.result(null)
   ),
   Template:   r => r.Instruction.atLeast(1).trim(_)
 })
