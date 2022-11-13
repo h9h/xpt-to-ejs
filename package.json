@@ -12,7 +12,7 @@
     "yargs": "^17.6.2"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node x2e.js",
     "test": "jest"
   },
   "devDependencies": {

@@ -33,6 +33,17 @@ const h_if = xtend => {
   })
 }
 
+const h_elseif = xtend => {
+  if (!xtend.elseif) return SKIP
+  const value = removeTrailingMinus(xtend.elseif)
+  return makeResult({
+      ejs: `<% } else { %><%if (${value}) {%>
+        <%# TODO: add another closing block at next ENDIF %>`,
+      instruction: `[ELSEIF] CAUTION: Need to add a second closing tag "<% } %>" at next ENDIF!
+      && Resolve "${value}"`
+  })
+}
+
 const h_else = xtend => {
   if(xtend !== 'ELSE') return SKIP
   return makeResult({
@@ -198,6 +209,13 @@ const h_endrem = xtend => {
   })
 }
 
+const h_indent = xtend => {
+  if(xtend !== 'indent') return SKIP
+  return makeResult({
+    ejs: '',
+  })
+}
+
 const h_substitution = xtend => {
   if(!xtend.substitution) return SKIP
   const value = removeTrailingMinus(xtend.substitution)
@@ -212,6 +230,7 @@ const h_substitution = xtend => {
 // --------------------------------------
 const XtendHandlers = [
   h_if,
+  h_elseif,
   h_else,
   h_endif,
   h_import,
@@ -227,6 +246,7 @@ const XtendHandlers = [
   h_error,
   h_rem,
   h_endrem,
+  h_indent,
   h_substitution
 ]
 

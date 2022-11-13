@@ -1,3 +1,26 @@
+/*
+# Definition of parser for Xten/Xpand files
+
+Language exported as Xpt.
+
+## Example usage
+
+Single instruction:
+
+```
+const { Xpt } = require('../src/xpt-parser')
+
+const ast = Xpt.XtendLet.tryParse('LET getTransformationResourceFileName(port, operation, role) + ".xq" AS xqFile')
+```
+
+Whole xpt-template:
+
+```
+const { Xpt } = require('../src/xpt-parser')
+
+const ast = Xpt.Template.tryParse(template)
+```
+*/
 const P = require('parsimmon')
 
 const _ = P.optWhitespace
@@ -9,6 +32,7 @@ const Xpt = P.createLanguage({
 
   // Keywords
   IF:           () => P.string('IF'),
+  ELSEIF:       () => P.string('ELSEIF'),
   ELSE:         () => P.string('ELSE').trim(_),
   ENDIF:        () => P.string('ENDIF').trim(_),
   EXPAND:       () => P.string('EXPAND'),
@@ -43,6 +67,10 @@ const Xpt = P.createLanguage({
   XtendIf:      r => P.seqObj(
       r.IF,
       ['bedingung', r.TextInFrench],
+    ),
+  XtendElseIf:  r => P.seqObj(
+      r.ELSEIF,
+      ['elseif', r.TextInFrench],
     ),
   XtendElse:    r => r.ELSE,
   XtendEndif:   r => r.ENDIF,
@@ -120,6 +148,7 @@ const Xpt = P.createLanguage({
     r.OpenFrench,
     ['XtendInstruction', P.alt(
       r.XtendIf,
+      r.XtendElseIf,
       r.XtendElse,
       r.XtendEndif,
       r.XtendImport,
