@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`generate ejs 1`] = `
+{
+  "ejs": "<%if (referenceExpr != nul) {%>
+    <assignment header="Reference"><%-referenceExpr%></assignment>
+      <% } %>
+  </assign>
+  <jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="<%-getDashboardMessageTimeToLive()%>">
+    <jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
+  </jms>
+  </fork>
+  ",
+  "error": [
+    "not handled: "ENDDEFINE"",
+  ],
+  "instructions": [
+    "Resolve "referenceExpr != nul"",
+    "[SUBSTITUTION] Check "referenceExpr"",
+    "[SUBSTITUTION] Check "getDashboardMessageTimeToLive()"",
+  ],
+}
+`;

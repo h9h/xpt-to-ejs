@@ -8,7 +8,7 @@ exports[`Parse input template 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
   <assignment header="Reference">",
   },
   {
@@ -17,14 +17,14 @@ exports[`Parse input template 1`] = `
     },
   },
   {
-    "template text": "</assignment>
+    "TemplateText": "</assignment>
 ",
   },
   {
     "XtendInstruction": "ENDIF",
   },
   {
-    "template text": "
+    "TemplateText": "
 </assign>
 <jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory" bytesMessage="true" timeToLive="",
   },
@@ -34,7 +34,7 @@ exports[`Parse input template 1`] = `
     },
   },
   {
-    "template text": "">
+    "TemplateText": "">
   <jndiDestination>java:comp/env/jms/DashboardQueue</jndiDestination>
 </jms>
 </fork>
@@ -44,7 +44,7 @@ exports[`Parse input template 1`] = `
     "XtendInstruction": "ENDDEFINE",
   },
   {
-    "template text": "
+    "TemplateText": "
 
 ",
   },
@@ -54,14 +54,14 @@ exports[`Parse input template 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
     "XtendInstruction": "indent",
   },
   {
-    "template text": "			<setMessage clearAll="true">
+    "TemplateText": "			<setMessage clearAll="true">
 
   ",
   },

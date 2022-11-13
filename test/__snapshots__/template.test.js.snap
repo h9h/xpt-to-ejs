@@ -8,7 +8,7 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
@@ -17,7 +17,7 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 
 ",
   },
@@ -27,7 +27,7 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
@@ -36,7 +36,7 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 
 ",
   },
@@ -46,14 +46,14 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
     "XtendInstruction": "ENDDEFINE",
   },
   {
-    "template text": "
+    "TemplateText": "
 
 ",
   },
@@ -63,7 +63,7 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
@@ -72,7 +72,7 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
@@ -81,21 +81,21 @@ exports[`Template 1 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
     "XtendInstruction": "ENDIF",
   },
   {
-    "template text": "
+    "TemplateText": "
 ",
   },
   {
     "XtendInstruction": "ENDDEFINE",
   },
   {
-    "template text": "
+    "TemplateText": "
   ",
   },
 ]
@@ -109,7 +109,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
   <service protocol="jms" errorHandler="jmsErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
     <jmsBinding jndiConnectionFactory="java:comp/env/",
   },
@@ -119,7 +119,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": """,
+    "TemplateText": """,
   },
   {
     "XtendInstruction": {
@@ -127,7 +127,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": ">
+    "TemplateText": ">
       <queueName>",
   },
   {
@@ -136,7 +136,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "</queueName>
+    "TemplateText": "</queueName>
     </jmsBinding>
     <actionPipeline name="jmsErrorhandler">
       <conditional expression="contains(exception/message, 'JMS')">
@@ -150,7 +150,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
     </actionPipeline>
   ",
   },
@@ -158,7 +158,7 @@ exports[`Template 2 1`] = `
     "XtendInstruction": "ELSE",
   },
   {
-    "template text": "
+    "TemplateText": "
   <service protocol="http" errorHandler="soapErrorhandler" version="1" xmlns="http://www.artofarc.com/esb/service">
     <httpBindURI",
   },
@@ -173,13 +173,13 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": " multipartResponse="application/xop+xml"",
+    "TemplateText": " multipartResponse="application/xop+xml"",
   },
   {
     "XtendInstruction": "ENDIF",
   },
   {
-    "template text": ">/",
+    "TemplateText": ">/",
   },
   {
     "XtendInstruction": {
@@ -187,7 +187,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "</httpBindURI>
+    "TemplateText": "</httpBindURI>
     <actionPipeline name="soapErrorhandler">
       <transform>
   ",
@@ -198,7 +198,7 @@ exports[`Template 2 1`] = `
     },
   },
   {
-    "template text": "
+    "TemplateText": "
         <xquery><![CDATA[<soap:Fault xmlns:soap="http://www.w3.org/2003/05/soap-envelope">
     <soap:Code><soap:Value>soap:Receiver</soap:Value></soap:Code>
     <soap:Reason><soap:Text xml:lang="en">{exception/message/text()}</soap:Text></soap:Reason>
@@ -210,7 +210,7 @@ exports[`Template 2 1`] = `
     "XtendInstruction": "ELSE",
   },
   {
-    "template text": "
+    "TemplateText": "
         <xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>{exception/message/text()}</faultstring><detail>{exception/cause}</detail></soapenv:Fault>]]></xquery>
   ",
   },
@@ -218,8 +218,1211 @@ exports[`Template 2 1`] = `
     "XtendInstruction": "ENDIF",
   },
   {
-    "template text": "
+    "TemplateText": "
     ",
+  },
+]
+`;
+
+exports[`Template xpt/WSDL-File-Async-Callback.xpt 1`] = `
+[
+  {
+    "XtendInstruction": {
+      "substitution": "REM",
+    },
+  },
+  {
+    "TemplateText": "
+Generates the Async Response .wsdl-Files for a synchronous WSDLPortType
+=> async (Consumer) / sync (Provider) mapping
+",
+  },
+  {
+    "XtendInstruction": "ENDREM",
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "import": "com::tmobile::ei::sbp::mm::content::core::iface",
+    },
+  },
+  {
+    "TemplateText": "
+
+",
+  },
+  {
+    "XtendInstruction": {
+      "extension": "extensions::osb",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "REM",
+    },
+  },
+  {
+    "TemplateText": "
+Assumptions:
+- default-namespace in wsdl:definitions is always "http://schemas.xmlsoap.org/wsdl/"
+  AND IGNORED by Importer (so we include default-namespace hardcoded here)
+- prefixes "wsdl" and "soap"
+  AND IGNORED by Importer (so we include them hardcoded here)
+",
+  },
+  {
+    "XtendInstruction": "ENDREM",
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": {
+      "define": "Root(String baseDir, String relDir, boolean abstract, boolean inline, boolean oneWay) FOR WSDLPortType",
+    },
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": {
+      "file": "baseDir + (relDir != null ? '/' + relDir.ensureEndsWithSlash() : '/') + WsdlFile("_Callback")",
+    },
+  },
+  {
+    "TemplateText": "<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+		name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "NameX()",
+    },
+  },
+  {
+    "TemplateText": "Definitions"
+		targetNamespace="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "TargetNamespaceUri()",
+    },
+  },
+  {
+    "TemplateText": ""
+		xmlns:tns="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "TargetNamespaceUri()",
+    },
+  },
+  {
+    "TemplateText": ""
+		xmlns="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+		xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	>
+	<!-- CEISeR version of WSDLPortType: ",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "validFromVersion",
+    },
+  },
+  {
+    "TemplateText": " (Branch: ",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "connectionToken.branch",
+    },
+  },
+  {
+    "TemplateText": ") -->
+	<!-- version: ",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "Version()",
+    },
+  },
+  {
+    "TemplateText": " -->
+	",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "targetNamespace.description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+	<wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(targetNamespace.description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+	",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+	<wsdl:types>
+	",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "inline-",
+    },
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "RecursiveReferencedNamespaceNotWellKnownOrOwn() AS currentNamespace-",
+    },
+  },
+  {
+    "TemplateText": "
+			",
+  },
+  {
+    "XtendInstruction": {
+      "expand": "XmlSchema::Root(this, relDir != null ? relDir.ensureEndsWithSlash() + Directory() : Directory(), inline) FOR currentNamespace",
+    },
+  },
+  {
+    "TemplateText": "
+		</xsd:schema>
+		",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "expand": "XmlSchema::Root(this, relDir != null ? relDir.ensureEndsWithSlash() + Directory() : Directory(), inline) FOR targetNamespace",
+    },
+  },
+  {
+    "TemplateText": "
+			",
+  },
+  {
+    "XtendInstruction": {
+      "let": "UsedPrefixes(targetNamespace).selectFirst(e|e.serviceNamespace.URI == getFoundationNamespaceURI()) AS eiPrefix -",
+    },
+  },
+  {
+    "TemplateText": "
+			",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "operations.reject(e|e.isCheckAlive()) AS operation -",
+    },
+  },
+  {
+    "TemplateText": "
+			<xsd:element name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ResponseElementName(operation)",
+    },
+  },
+  {
+    "TemplateText": "Acknowledge" type="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "eiPrefix.NameX()",
+    },
+  },
+  {
+    "TemplateText": ":acknowledgeRespType"/>
+			",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "REM",
+    },
+  },
+  {
+    "TemplateText": " empty response "ack" for incoming Fault message ",
+  },
+  {
+    "XtendInstruction": "ENDREM",
+  },
+  {
+    "TemplateText": "
+			<xsd:element name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getPostFixAsyncFaultOperation()",
+    },
+  },
+  {
+    "TemplateText": "" type="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "eiPrefix.NameX()",
+    },
+  },
+  {
+    "TemplateText": ":mepMappingFaultToBodyType"/>
+			",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+			",
+  },
+  {
+    "XtendInstruction": "ENDLET",
+  },
+  {
+    "TemplateText": "
+		</xsd:schema>
+	</wsdl:types>
+	<!-- ****************************************************************** -->
+	",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "operations AS operation -",
+    },
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "operation.isCheckAlive()-",
+    },
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "operation.UsedMessages() AS message-",
+    },
+  },
+  {
+    "TemplateText": "
+	<wsdl:message name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "">
+		",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "message.description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "message.parts AS part-",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:part name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "part.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" element="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "part.messageType.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" />
+		",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+	</wsdl:message>
+	",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": "ELSE",
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": {
+      "let": "operation.output.message AS message-",
+    },
+  },
+  {
+    "TemplateText": "
+	<wsdl:message name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "">
+		",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "message.description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "(Collection[WSDLMessagePart])message.parts AS part -",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:part name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "part.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" element="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "part.messageType.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" />
+		",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+	</wsdl:message>
+	<wsdl:message name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getPostFixAsyncFaultOperation()",
+    },
+  },
+  {
+    "TemplateText": "">
+		<wsdl:part name="parameters" element="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getPostFixAsyncFaultOperation()",
+    },
+  },
+  {
+    "TemplateText": "" />
+	</wsdl:message>
+	<wsdl:message name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "_Output">
+		<wsdl:part name="parameters" element="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ResponseElementName(operation)",
+    },
+  },
+  {
+    "TemplateText": "Acknowledge" />
+	</wsdl:message>
+	<wsdl:message name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "_Fault">
+		<wsdl:part name="fault" element="tns:FaultDetail" />
+	</wsdl:message>
+	",
+  },
+  {
+    "XtendInstruction": "ENDLET",
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+	",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+	<!-- ****************************************************************** -->
+	<wsdl:portType name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "WsdlPortTypeName()",
+    },
+  },
+  {
+    "TemplateText": "Callback">
+		",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "operations.reject(e|e.isCheckAlive()) AS operation -",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:operation name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ResponseElementName(operation)",
+    },
+  },
+  {
+    "TemplateText": "">
+			",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "operation.description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+			<wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(operation.description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+			",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+			<wsdl:input",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!operation.isInputLogicallyNameless()",
+    },
+  },
+  {
+    "TemplateText": " name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.output.NameX()",
+    },
+  },
+  {
+    "TemplateText": """,
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": " message="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.output.message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" />
+			",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!oneWay-",
+    },
+  },
+  {
+    "TemplateText": "
+			<wsdl:output message="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.output.message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "_Output" />
+			<wsdl:fault message="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.output.message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "_Fault" name="TechnicalExceptionFault" />
+			",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		</wsdl:operation>
+		<wsdl:operation name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getPostFixAsyncFaultOperation()",
+    },
+  },
+  {
+    "TemplateText": "">
+			",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "operation.description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+			<wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(operation.description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+			",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+			<wsdl:input message="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getPostFixAsyncFaultOperation()",
+    },
+  },
+  {
+    "TemplateText": "" />
+			",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!oneWay-",
+    },
+  },
+  {
+    "TemplateText": "
+			<wsdl:output message="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.output.message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "_Output" />
+			<wsdl:fault message="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.output.message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "_Fault" name="TechnicalExceptionFault" />
+			",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		</wsdl:operation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "let": "operations.selectFirst(e|e.isCheckAlive()) AS operation-",
+    },
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "operation != null-",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:operation name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "TemplateText": "">
+			",
+  },
+  {
+    "XtendInstruction": {
+      "expand": "WsdlFile::AbstractOperationContent(oneWay) FOR operation-",
+    },
+  },
+  {
+    "TemplateText": "
+		</wsdl:operation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": "ENDLET",
+  },
+  {
+    "TemplateText": "
+	</wsdl:portType>
+	",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!abstract -",
+    },
+  },
+  {
+    "TemplateText": "
+	<!-- ****************************************************************** -->
+	<wsdl:binding name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "WsdlPortTypeName()",
+    },
+  },
+  {
+    "TemplateText": "CallbackBinding" type="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "WsdlPortTypeName()",
+    },
+  },
+  {
+    "TemplateText": "Callback">
+		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http" />
+		",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "operations.reject(e|e.isCheckAlive()) AS operation -",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:operation name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ResponseElementName(operation)",
+    },
+  },
+  {
+    "TemplateText": "">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!oneWay-",
+    },
+  },
+  {
+    "TemplateText": "
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="TechnicalExceptionFault">
+				<soap:fault name="TechnicalExceptionFault" use="literal" />
+			</wsdl:fault>
+			",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		</wsdl:operation>
+		<wsdl:operation name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "getPostFixAsyncFaultOperation()",
+    },
+  },
+  {
+    "TemplateText": "">
+			<soap:operation soapAction=""/>
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "!oneWay-",
+    },
+  },
+  {
+    "TemplateText": "
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="TechnicalExceptionFault">
+				<soap:fault name="TechnicalExceptionFault" use="literal" />
+			</wsdl:fault>
+			",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		</wsdl:operation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "let": "operations.selectFirst(e|e.isCheckAlive()) AS operation-",
+    },
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "operation != null-",
+    },
+  },
+  {
+    "TemplateText": "
+		<wsdl:operation name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.NameX()",
+    },
+  },
+  {
+    "TemplateText": "">
+			<soap:operation",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "operation.soapAction != null",
+    },
+  },
+  {
+    "TemplateText": " soapAction="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "operation.soapAction",
+    },
+  },
+  {
+    "TemplateText": """,
+  },
+  {
+    "XtendInstruction": "ELSE",
+  },
+  {
+    "TemplateText": " soapAction=""",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "/>
+			",
+  },
+  {
+    "XtendInstruction": {
+      "expand": "WsdlFile::BindingOperationContent(oneWay) FOR operation-",
+    },
+  },
+  {
+    "TemplateText": "
+		</wsdl:operation>
+		",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+		",
+  },
+  {
+    "XtendInstruction": "ENDLET",
+  },
+  {
+    "TemplateText": "
+	</wsdl:binding>
+	<!-- ****************************************************************** -->
+	<wsdl:service name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "WsdlPortTypeName()",
+    },
+  },
+  {
+    "TemplateText": "CallbackService">
+		<wsdl:port name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "WsdlPortTypeName()",
+    },
+  },
+  {
+    "TemplateText": "Callback" binding="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "WsdlPortTypeName()",
+    },
+  },
+  {
+    "TemplateText": "CallbackBinding">
+			<soap:address location="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "DummyServicePortAddressLocationPrefix()",
+    },
+  },
+  {
+    "TemplateText": "" />
+		</wsdl:port>
+	</wsdl:service>
+	",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+</wsdl:definitions>
+	",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "ENDFILE",
+    },
+  },
+  {
+    "TemplateText": "
+",
+  },
+  {
+    "XtendInstruction": "ENDDEFINE",
+  },
+  {
+    "TemplateText": "
+",
+  },
+]
+`;
+
+exports[`heavy nesting 1`] = `
+[
+  {
+    "TemplateText": "<wsdl:message name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "message.NameX()",
+    },
+  },
+  {
+    "TemplateText": "">
+    ",
+  },
+  {
+    "XtendInstruction": {
+      "bedingung": "message.description != null-",
+    },
+  },
+  {
+    "TemplateText": "
+    <wsdl:documentation>",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "escapeXml(description)",
+    },
+  },
+  {
+    "TemplateText": "</wsdl:documentation>
+    ",
+  },
+  {
+    "XtendInstruction": "ENDIF",
+  },
+  {
+    "TemplateText": "
+    ",
+  },
+  {
+    "XtendInstruction": {
+      "forEach": "(Collection[WSDLMessagePart])message.parts AS part -",
+    },
+  },
+  {
+    "TemplateText": "
+    <wsdl:part name="",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "part.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" element="tns:",
+  },
+  {
+    "XtendInstruction": {
+      "substitution": "part.messageType.NameX()",
+    },
+  },
+  {
+    "TemplateText": "" />
+    ",
+  },
+  {
+    "XtendInstruction": "ENDFOREACH",
+  },
+  {
+    "TemplateText": "
+  </wsdl:message>
+  ",
   },
 ]
 `;

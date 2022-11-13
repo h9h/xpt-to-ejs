@@ -8,30 +8,30 @@ const Xpt = P.createLanguage({
   CloseFrench:  () => P.alt(P.string('-»'), P.string('»')).map(b => b == '»'),
 
   // Keywords
-  IF:           () => P.string('IF').trim(_),
-  ELSE:         () => P.string('ELSE'),
-  ENDIF:        () => P.string('ENDIF'),
+  IF:           () => P.string('IF'),
+  ELSE:         () => P.string('ELSE').trim(_),
+  ENDIF:        () => P.string('ENDIF').trim(_),
   EXPAND:       () => P.string('EXPAND'),
   IMPORT:       () => P.string('IMPORT'),
   EXTENSION:    () => P.string('EXTENSION'),
   DEFINE:       () => P.string('DEFINE'),
-  ENDDEFINE:    () => P.string('ENDDEFINE'),
+  ENDDEFINE:    () => P.string('ENDDEFINE').trim(_),
   FOR:          () => P.string('FOR'),
   FOREACH:      () => P.string('FOREACH'),
-  ENDFOREACH:   () => P.string('ENDFOREACH'),
+  ENDFOREACH:   () => P.string('ENDFOREACH').trim(_),
   LET:          () => P.string('LET'),
-  ENDLET:       () => P.string('ENDLET'),
+  ENDLET:       () => P.string('ENDLET').trim(_),
   ERROR:        () => P.string('ERROR'),
   FILE:         () => P.string('FILE'),
-  ENDFILE:      () => P.string('ENDFILE'),
+  ENDFILE:      () => P.string('ENDFILE').trim(_),
   REM:          () => P.string('REM'),
-  ENDREM:       () => P.string('ENDREM'),
+  ENDREM:       () => P.string('ENDREM').trim(_),
   INDENT:       () => P.string('indent'),
 
   // Parts
   TextInFrench: r => P.regexp(/[^»]+/).trim(_),
   TemplateText: () => P.seqObj(
-    ['template text', P.regexp(/[^«»]+/)]
+    ['TemplateText', P.regexp(/[^«»]+/)]
   ),
 
 

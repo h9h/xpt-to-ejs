@@ -1,4 +1,6 @@
 const { Xpt } = require('../src/xpt-parser')
+const fs = require('fs')
+const path = require('path')
 
 test('Template 1', () => {
   const template = `
@@ -54,3 +56,25 @@ test('Template 2', () => {
     expect(Xpt.Template.tryParse(template)).toMatchSnapshot()
   })
 
+  test('heavy nesting', () => {
+    const template = `	<wsdl:message name="«message.NameX()»">
+    «IF message.description != null-»
+    <wsdl:documentation>«escapeXml(description)»</wsdl:documentation>
+    «ENDIF-»
+    «FOREACH (Collection[WSDLMessagePart])message.parts AS part -»
+    <wsdl:part name="«part.NameX()»" element="tns:«part.messageType.NameX()»" />
+    «ENDFOREACH -»
+  </wsdl:message>
+  `
+
+  expect(Xpt.Template.tryParse(template)).toMatchSnapshot()
+})
+
+  test('Template xpt/WSDL-File-Async-Callback.xpt', () => {
+    const template = fs.readFileSync(
+      path.resolve(__dirname, '../xpt/WSDL-File-Async-Callback.xpt'),
+      { encoding: 'utf-8' }
+    )
+
+    expect(Xpt.Template.tryParse(template)).toMatchSnapshot()
+  })
