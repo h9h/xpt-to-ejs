@@ -3,7 +3,7 @@ const path = require('path')
 
 const { Xpt } = require("./xpt-parser")
 const { generateEjs } = require("./generateEjs")
-const { makeAbsolute, formatMarkdown } = require("../helper")
+const { makeAbsolute, formatMarkdown, getEncoding } = require("../helper")
 
 // Default options
 const transformOptions = {
@@ -41,11 +41,11 @@ const transformFile    = (filename, options) => {
     abort(`File "${f}" not found`)
   }
 
-  console.log(`reading template ${f}`)
+  console.log(`    reading template ${f}`)
   const template = fs.readFileSync(f, { encoding: opts.templateEncoding })
-  console.log(`parsing template`)
+  console.log(`    parsing template`)
   const ast = Xpt.Template.tryParse(template)
-  console.log(`generating ejs`)
+  console.log(`    generating ejs`)
   const { ejs, error, instructions } = generateEjs(ast)
 
   if (error.length > 0) {
@@ -63,21 +63,21 @@ const transformFile    = (filename, options) => {
   const outgendir = path.dirname(ejsFile)
   if (!fs.existsSync(outgendir)) {
     console.log(`Creating directory ${outgendir}`)
-    fs.mkdirSync(outgendir)
+    fs.mkdirSync(outgendir, { recursive: true })
   }
 
   if (!opts.overwrite && filename.existsSync(ejsFile)) {
     abort(`Generated file "${ejsFile}" already exists`)
   }
-  console.log(`Writing ejs file "${ejsFile}"`)
-  fs.writeFileSync(ejsFile, ejs, { flag: 'w' })
+  console.log(`    Writing ejs file "${ejsFile}"`)
+  fs.writeFileSync(ejsFile, ejs, { flag: 'w', encoding: 'utf8' })
 
   const mdFile = makeOutFilename(f, opts.out, 'md')
   if (!opts.overwrite && filename.existsSync(ejsFile)) {
-    abort(`Generated file "${mdFile}" already exists`)
+    abort(`    Generated file "${mdFile}" already exists`)
   }
-  console.log(`Writing instructions file "${mdFile}"`)
-  fs.writeFileSync(mdFile, formatMarkdown(instructions, filename, ejsFile), { flag: 'w' })
+  console.log(`    Writing instructions file "${mdFile}"`)
+  fs.writeFileSync(mdFile, formatMarkdown(instructions, filename, ejsFile), { flag: 'w', encoding: 'utf8' })
 }
 
 const transformDir = (dirname, options) => {
@@ -96,8 +96,13 @@ const transformDir = (dirname, options) => {
         walkSync(filepath);
       } else if (stats.isFile() && path.extname(filepath) === '.xpt') {
         const relativeDir = path.dirname(path.relative(dirname, filepath))
-        console.log("fff             ", filepath, relativeDir)
-        transformFile(filepath, { ...options, out: path.join(options.out, relativeDir) })
+        const enc = getEncoding(filepath)
+        console.log(filepath, enc)
+        transformFile(filepath, {
+          ...options,
+          out: path.join(options.out, relativeDir),
+          templateEncoding: enc || options.templateEncoding
+        })
       }
     })
   }

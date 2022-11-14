@@ -19,7 +19,37 @@
 ```
 More Xtend instructions:
 
-REM/ENDREM - Comments
+- REM/ENDREM - Comments
 
 ## Grammar
 
+[Xpand Reference](https://git.eclipse.org/c/m2t/org.eclipse.xpand.git/plain/doc/org.eclipse.xpand.doc/manual/xpand_reference.pdf)
+
+## Usage
+
+
+See 
+
+```
+node x2e.js
+```
+
+```
+Usage: -f <filename> [options]
+
+Options:
+      --version           Show version number                          [boolean]
+  -f, --filename          The filename to the file, that is to be transformed
+  -d, --directory         The directory containing the files, that are to be
+                          transformed
+  -o, --out               Output directory        [default: "<current dir>\gen"]
+      --overwrite         Overwrite generated files    [boolean] [default: true]
+      --haltOnError       Exit on error                [boolean] [default: true]
+      --templateEncoding  Encoding of input files             [default: "utf-8"]
+  -h, --help              Show help                                    [boolean]
+
+Examples:
+  x2e.js template.xpt -o false
+
+You must supply either filename or directory
+```

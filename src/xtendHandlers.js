@@ -209,13 +209,6 @@ const h_endrem = xtend => {
   })
 }
 
-const h_indent = xtend => {
-  if(xtend !== 'indent') return SKIP
-  return makeResult({
-    ejs: '',
-  })
-}
-
 const h_substitution = xtend => {
   if(!xtend.substitution) return SKIP
   const value = removeTrailingMinus(xtend.substitution)
@@ -246,7 +239,6 @@ const XtendHandlers = [
   h_error,
   h_rem,
   h_endrem,
-  h_indent,
   h_substitution
 ]
 

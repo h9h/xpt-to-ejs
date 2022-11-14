@@ -50,7 +50,6 @@ const Xpt = P.createLanguage({
   ENDFILE:      () => P.string('ENDFILE').trim(_),
   REM:          () => P.string('REM'),
   ENDREM:       () => P.string('ENDREM').trim(_),
-  INDENT:       () => P.string('indent'),
 
   // Parts
   TextInFrench: r => P.regexp(/[^»]+/).trim(_),
@@ -134,8 +133,6 @@ const Xpt = P.createLanguage({
   XtendRem:       r => r.REM,
   XtendEndRem:    r => r.ENDREM,
 
-  XtendIndent:    r => r.INDENT,
-
   // «getRequestHeaderElements(portBinding.port, operation).first().localPart
   XtendSubstitution:  r => P.seqObj(
     ['substitution', r.TextInFrench]
@@ -164,7 +161,6 @@ const Xpt = P.createLanguage({
       r.XtendEndDefine,
       r.XtendRem,
       r.XtendEndRem,
-      r.XtendIndent,
       // least specific --> last parser option
       r.XtendSubstitution,
     )],

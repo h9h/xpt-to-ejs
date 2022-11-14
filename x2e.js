@@ -6,7 +6,7 @@ const { makeAbsolute } = require('./helper')
 const { transformFile, transformDir } = require('./src/commands')
 
 const argv = yargs(hideBin(process.argv))
-  .usage('Usage: -f <filename> [options]')
+  .usage('Usage: -d <directory> [options]')
   .example('$0 template.xpt -o false')
   .alias('f', 'filename')
   .describe('f', 'The filename to the file, that is to be transformed')
@@ -29,8 +29,6 @@ const argv = yargs(hideBin(process.argv))
   .boolean('haltOnError')
   .describe('haltOnError', 'Exit on error')
   .default('haltOnError', transformOptions.haltOnError)
-  .describe('templateEncoding', 'Encoding of input files')
-  .default('templateEncoding', transformOptions.templateEncoding)
   .help()
   .alias('h', 'help')
   .wrap(80)
@@ -38,7 +36,7 @@ const argv = yargs(hideBin(process.argv))
 
 const init = argv.out ? { out: makeAbsolute(argv.out) } : {}
 
-const options = ['overwrite', 'haltOnError', 'templateEncoding'].reduce((o, arg) => {
+const options = ['overwrite', 'haltOnError'].reduce((o, arg) => {
   if (argv[arg]) {
     o[arg] = argv[arg]
   }

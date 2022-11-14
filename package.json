@@ -2,11 +2,12 @@
   "name": "xpt-to-ejs",
   "version": "1.0.0",
   "description": "Translate xpt to ejs",
-  "main": "index.js",
+  "main": "x2e.js",
   "repository": "https://github.com/h9h/xpt-to-ejs.git",
   "author": "Michael <git@h9h.de>",
   "license": "MIT",
   "private": false,
+  "keywords": ["xtend", "xpand", "parser", "parsimmon", "ejs"],
   "dependencies": {
     "parsimmon": "^1.18.1",
     "yargs": "^17.6.2"

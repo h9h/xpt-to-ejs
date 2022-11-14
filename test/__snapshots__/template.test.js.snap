@@ -1913,14 +1913,18 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<setMessage clearAll="true">
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="MEP">",
@@ -1935,7 +1939,9 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="LogPointNo">",
@@ -1950,14 +1956,18 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="Originator">ESB0</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="Description">",
@@ -1972,7 +1982,9 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="Environment">",
@@ -1987,28 +1999,36 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="Operation">\${operation}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="Service">\${serviceNamespace}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="LogTimeStamp">\${initialTimestamp}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<header name="MessageType">",
@@ -2023,28 +2043,36 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			</setMessage>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory">
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<jndiDestination>java:comp/env/jms/DashboardRejectedMessageQueue</jndiDestination>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			</jms>
@@ -2060,14 +2088,18 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<transform>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<xquery><![CDATA[<soapenv:Fault xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"><faultcode>soapenv:Server</faultcode><faultstring>",
@@ -2090,35 +2122,45 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			</transform>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<setMessage>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "				<variable name="HttpResponseCode" javaType="java.lang.Integer">500</variable>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			</setMessage>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<wrapSOAP/>
@@ -2149,21 +2191,27 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		<setMessage clearAll="true">
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="MEP">\${MEP}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="Environment">",
@@ -2178,35 +2226,45 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="Operation">\${operation}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="Service">\${serviceNamespace}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="LogTimeStamp">\${initialTimestamp}</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="Originator">ESB0</header>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<header name="MessageType">",
@@ -2221,77 +2279,99 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		</setMessage>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		<assign>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<bindName>messageHeader</bindName>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<nsDecl namespace="http://svi.de/kdf/ei/foundation/v1" prefix="v1"/>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="senderFQN">$messageHeader/v1:senderFQN[1]/text()</assignment>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="messageId">$messageHeader/v1:messageId[1]/text()</assignment>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="relatesToMessageId" nullable="true">$messageHeader/v1:relatesToMessageId[1]/text()</assignment>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="senderCurrentTimestampUTC">$messageHeader/v1:senderCurrentTimestampUTC[1]/text()</assignment>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="processInstanceId">$messageHeader/v1:processInstanceId[1]/text()</assignment>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="parentProcessInstanceId" nullable="true">$messageHeader/v1:parentProcessInstanceId[1]/text()</assignment>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="errorCode">",
@@ -2306,7 +2386,9 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<assignment header="reason">",
@@ -2321,56 +2403,72 @@ exports[`Template xpt/esb0/Dashboard.xpt 1`] = `
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		</assign>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		<transform>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<xquery>declare variable $_request as element() external; $_request</xquery>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		</transform>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		<jms jndiConnectionFactory="java:comp/env/jms/DashboardConnectionFactory">
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "			<jndiDestination>java:comp/env/jms/DashboardUndeliveredMessageQueue</jndiDestination>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		</jms>
 ",
   },
   {
-    "XtendInstruction": "indent",
+    "XtendInstruction": {
+      "substitution": "indent",
+    },
   },
   {
     "TemplateText": "		<internalService serviceURI="/logging/InternalLog_44"/>
