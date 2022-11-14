@@ -1,5 +1,5 @@
 /*
-# Definition of parser for Xten/Xpand files
+# Definition of parser for Xtend/Xpand files
 
 Language exported as Xpt.
 
