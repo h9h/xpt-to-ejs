@@ -42,10 +42,9 @@ Options:
   -f, --filename          The filename to the file, that is to be transformed
   -d, --directory         The directory containing the files, that are to be
                           transformed
-  -o, --out               Output directory        [default: "<current dir>\gen"]
+  -o, --out               Output directory        [default: "<current dir>/gen"]
       --overwrite         Overwrite generated files    [boolean] [default: true]
       --haltOnError       Exit on error                [boolean] [default: true]
-      --templateEncoding  Encoding of input files             [default: "utf-8"]
   -h, --help              Show help                                    [boolean]
 
 Examples:
