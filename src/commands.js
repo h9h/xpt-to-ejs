@@ -43,6 +43,12 @@ const transformFile    = (filename, options) => {
 
   console.log(`    reading template ${f}`)
   const template = fs.readFileSync(f, { encoding: opts.templateEncoding })
+  if(template.indexOf('«') < 0) {
+    console.log(`    Read file, didn't find any "«" - saved in wrong encoding?`)
+    console.log('    ---------------------------------------------------------')
+    console.log('    Beginning of file:')
+    console.log(template.substring(0, 80))
+  }
   console.log(`    parsing template`)
   const ast = Xpt.Template.tryParse(template)
   console.log(`    generating ejs`)
