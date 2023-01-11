@@ -28,7 +28,7 @@ const _ = P.optWhitespace
 const Xpt = P.createLanguage({
   // Symbols
   OpenFrench:   () => P.string('«'),
-  CloseFrench:  () => P.alt(P.string('-»'), P.string('»')).map(b => b == '»'),
+  CloseFrench:  () => P.alt(P.string('-»'), P.string('»')).map(b => b === '»'),
 
   // Keywords
   IF:           () => P.string('IF'),
@@ -50,9 +50,10 @@ const Xpt = P.createLanguage({
   ENDFILE:      () => P.string('ENDFILE').trim(_),
   REM:          () => P.string('REM'),
   ENDREM:       () => P.string('ENDREM').trim(_),
+  EscapeXml:    () => P.string('escapeXml'),
 
   // Parts
-  TextInFrench: r => P.regexp(/[^»]+/).trim(_),
+  TextInFrench: () => P.regexp(/[^»]+/).trim(_),
   TemplateText: () => P.seqObj(
     ['TemplateText', P.regexp(/[^«»]+/)]
   ),
@@ -129,6 +130,12 @@ const Xpt = P.createLanguage({
   ),
   XtendEndDefine:     r => r.ENDDEFINE,
 
+  // «escapeXml(targetNamespace.description)»
+  XtendEscapeXml:    r => P.seqObj(
+    r.EscapeXml,
+    ['escapeXml', r.TextInFrench]
+  ),
+
   // «REM»
   XtendRem:       r => r.REM,
   XtendEndRem:    r => r.ENDREM,
@@ -161,6 +168,7 @@ const Xpt = P.createLanguage({
       r.XtendEndDefine,
       r.XtendRem,
       r.XtendEndRem,
+      r.XtendEscapeXml,
       // least specific --> last parser option
       r.XtendSubstitution,
     )],

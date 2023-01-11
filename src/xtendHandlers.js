@@ -8,6 +8,8 @@
 const SKIP = { skip: true, result: null }
 
 const removeTrailingMinus = s => s.charAt(s.length-1) === '-' ? s.substring(0,s.length-1) : s
+const removeBrackets = s => s.substring(1,s.length-1)
+
 const makeResult = result => ({ skip: false, result })
 
 // template function corpus
@@ -28,7 +30,7 @@ const h_if = xtend => {
   if (!xtend.bedingung) return SKIP
   const value = removeTrailingMinus(xtend.bedingung)
   return makeResult({
-      ejs: `<%if (${value}) {%>`,
+      ejs: `<%_ if (${value}) { _%>`,
       instruction: `Resolve "${value}"`
   })
 }
@@ -37,24 +39,22 @@ const h_elseif = xtend => {
   if (!xtend.elseif) return SKIP
   const value = removeTrailingMinus(xtend.elseif)
   return makeResult({
-      ejs: `<% } else { %><%if (${value}) {%>
-        <%# TODO: add another closing block at next ENDIF %>`,
-      instruction: `[ELSEIF] CAUTION: Need to add a second closing tag "<% } %>" at next ENDIF!
-      && Resolve "${value}"`
+      ejs: `<%_ } else if (${value}) { _%>`,
+    instruction: `Resolve "${value}"`
   })
 }
 
 const h_else = xtend => {
   if(xtend !== 'ELSE') return SKIP
   return makeResult({
-    ejs: '<% } else { %>',
+    ejs: '<%_ } else { _%>',
   })
 }
 
 const h_endif = xtend => {
   if(xtend !== 'ENDIF') return SKIP
   return makeResult({
-    ejs: '<% } /* end-if */ %>',
+    ejs: '<%_ } /* end-if */ _%>',
   })
 }
 
@@ -169,10 +169,19 @@ const h_foreach = xtend => {
   const value = removeTrailingMinus(xtend.forEach)
   try {
     const [expression, variable] = value.split(" AS ")
-    return makeResult({
-      ejs: `<% ${expression}.forEach(${variable} => { %>`,
-      instruction: `[FOREACH] Handle foreach definition: ${value}`
-    })
+    const iteratorClause = value.split(" ITERATOR ")
+    if (iteratorClause.length > 1) {
+      const [variable2, iterator] = iteratorClause
+      return makeResult({
+        ejs: `<% ${expression}.forEach((${variable2}, ${iterator}) => { %>`,
+        instruction: `[FOREACH] Handle foreach definition: ${variable2} and counter ${iterator}`
+      })
+    } else {
+      return makeResult({
+        ejs: `<% ${expression}.forEach(${variable} => { %>`,
+        instruction: `[FOREACH] Handle foreach definition: ${value}`
+      })
+    }
   } catch (e) {
     return makeResult({
       ejs: `<%# TODO: FOREACH "${value}" %><% { %>`,
@@ -183,7 +192,7 @@ const h_foreach = xtend => {
 const h_endforeach = xtend => {
   if(xtend !== 'ENDFOREACH') return SKIP
   return makeResult({
-    ejs: '<% } /* end-forEach */ %>',
+    ejs: '<% }) /* end-forEach */ %>',
   })
 }
 
@@ -218,6 +227,15 @@ const h_substitution = xtend => {
   })
 }
 
+const h_escapeXml = xtend => {
+  if(!xtend.escapeXml) return SKIP
+  const value = removeBrackets(removeTrailingMinus(xtend.escapeXml))
+  return makeResult({
+    ejs: `<%=${value}%>`,
+    instruction: `[escapeXml] Check "${value}"`
+  })
+}
+
 // --------------------------------------
 // Collect und export Handlers
 // --------------------------------------
@@ -234,11 +252,13 @@ const XtendHandlers = [
   h_endlet,
   h_define,
   h_enddefine,
+  h_endfile,
   h_foreach,
   h_endforeach,
   h_error,
   h_rem,
   h_endrem,
+  h_escapeXml,
   h_substitution
 ]
 
